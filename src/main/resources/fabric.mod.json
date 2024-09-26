@@ -1,0 +1,37 @@
+{
+	"schemaVersion": 1,
+	"id": "borukva_inventory_backup",
+	"version": "${version}",
+	"name": "borukva_inventory_backup",
+	"description": "From Fiv_ to Borukwa",
+	"authors": [
+		"Fiv_"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/borukva_death_backup/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+          "net.fiv.BorukvaInventoryBackup"
+		],
+		"fabric-datagen": [
+			"net.fiv.Borukva_inventory_backupDataGenerator"
+		]
+	},
+	"mixins": [
+		"borukva_inventory_backup.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.16.5",
+		"minecraft": "~1.21",
+		"java": ">=21",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}

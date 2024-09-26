@@ -1,0 +1,13 @@
+{
+	"required": true,
+	"package": "net.fiv.mixin",
+	"compatibilityLevel": "JAVA_21",
+	"mixins": [
+		"OnPlayerDeathMixin",
+		"OnPlayerLoginMixin",
+		"OnPlayerLogoutMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}
