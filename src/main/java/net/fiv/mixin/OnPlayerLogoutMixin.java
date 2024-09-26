@@ -1,11 +1,8 @@
 package net.fiv.mixin;
 
-
-import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fiv.BorukvaInventoryBackup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.PlayerManager;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.collection.DefaultedList;
 import org.slf4j.Logger;

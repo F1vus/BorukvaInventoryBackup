@@ -10,8 +10,6 @@ import net.fiv.config.ModConfigs;
 import net.fiv.data_base.entities.DeathTable;
 import net.fiv.gui.DeathHistoryGui;
 import net.fiv.gui.TableListGui;
-import net.minecraft.command.argument.ArgumentTypes;
-import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
