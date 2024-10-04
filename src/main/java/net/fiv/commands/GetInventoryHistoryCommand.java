@@ -32,12 +32,11 @@ public class GetInventoryHistoryCommand {
             dispatcher.register(CommandManager.literal("getInventoryHistory").then(CommandManager
                     .argument("player", StringArgumentType.string())
                     .executes(GetInventoryHistoryCommand::run)));
-
         });
     }
 
 
-    public static int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException{
+    public static int run(CommandContext<ServerCommandSource> context){
         ServerPlayerEntity player = context.getSource().getPlayer();
         String playerName = StringArgumentType.getString(context, "player");
         if(InventoryGui.getOfflinePlayerProfile(playerName, player.getServer()) == null){
