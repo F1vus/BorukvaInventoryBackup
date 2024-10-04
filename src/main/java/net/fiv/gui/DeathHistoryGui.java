@@ -104,8 +104,6 @@ public class DeathHistoryGui extends SimpleGui {
         return currentIndex;
     }
 
-
-
 }
 
 

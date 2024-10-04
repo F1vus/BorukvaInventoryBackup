@@ -2,6 +2,7 @@ package net.fiv.gui;
 
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import eu.pb4.sgui.api.gui.SimpleGui;
+import net.fiv.commands.GetInventoryHistoryCommand;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
@@ -21,7 +22,7 @@ public class TableListGui extends SimpleGui {
         super(ScreenHandlerType.GENERIC_9X1, player, false);
         this.setTitle(Text.literal(playerName+"'s tables list"));
 
-        addButtons();
+        addButtons(playerName);
     }
 
     @Override
@@ -30,11 +31,15 @@ public class TableListGui extends SimpleGui {
         return true;
     }
 
-    private void addButtons(){
+    private void addButtons(String playerName){
         this.setSlot(3, new GuiElementBuilder(Items.CHEST)
                 .setName(Text.literal("Історія входів").formatted(Formatting.GREEN, Formatting.BOLD))
                 .setCallback((index, type, action) -> {
-                    new LoginHistoryGui(player).open();
+                    GetInventoryHistoryCommand.addLoginTableMap(player, playerName);
+                    LoginHistoryGui loginHistoryGui = (LoginHistoryGui) activeTables.get(this.player.getName().getString()).getFirst();
+
+                    loginHistoryGui.addButtons();
+                    loginHistoryGui.open();
                         })
 
                 .build());
@@ -42,7 +47,11 @@ public class TableListGui extends SimpleGui {
         this.setSlot(4, new GuiElementBuilder(Items.CHEST)
                 .setName(Text.literal("Історія виходів").formatted(Formatting.YELLOW, Formatting.BOLD))
                 .setCallback((index, type, action) -> {
-                    new LogoutHistoryGui(player).open();
+                    GetInventoryHistoryCommand.addLogoutTableMap(player, playerName);
+                    LogoutHistoryGui logoutHistoryGui = (LogoutHistoryGui) activeTables.get(this.player.getName().getString()).getFirst();
+
+                    logoutHistoryGui.addButtons();
+                    logoutHistoryGui.open();
                 })
 
                 .build());
@@ -50,6 +59,7 @@ public class TableListGui extends SimpleGui {
         this.setSlot(5, new GuiElementBuilder(Items.CHEST)
                 .setName(Text.literal("Історія смертей").formatted(Formatting.RED, Formatting.BOLD))
                 .setCallback((index, type, action) -> {
+                    GetInventoryHistoryCommand.addDeathTableMap(player, playerName);
                     DeathHistoryGui deathHistoryGui = (DeathHistoryGui) activeTables.get(this.player.getName().getString()).getFirst();
 
                     deathHistoryGui.addButtons();
