@@ -2,8 +2,6 @@ package net.fiv.commands;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.sun.jna.ptr.ShortByReference;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fiv.BorukvaInventoryBackup;
@@ -42,7 +40,7 @@ public class GetInventoryHistoryCommand {
         String playerName = StringArgumentType.getString(context, "player");
         System.out.println(InventoryGui.getOfflinePlayerProfile(playerName, player.getServer()));
         try {
-            if (!BorukvaInventoryBackup.getBorukvaDeathBackupDB().playerDeathExist(playerName)) {
+            if (!BorukvaInventoryBackup.getBorukvaDeathBackupDB().playerLoginTableExist(playerName)) {
                 player.sendMessage(Text.literal("Такого гравця не існує"));
                 return 0;
             }
