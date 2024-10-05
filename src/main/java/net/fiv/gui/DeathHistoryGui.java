@@ -76,17 +76,20 @@ public class DeathHistoryGui extends SimpleGui {
             String inventory = deathTableList.get(i).getInventory();
             String armor = deathTableList.get(i).getArmor();
             String offHand = deathTableList.get(i).getOffHand();
+            int xp = deathTableList.get(i).getXp();
             this.setSlot(i, new GuiElementBuilder(Items.CHEST)
                     .setName(Text.literal("Time: "+deathTableList.get(i).getDate()))
                     .addLoreLine(Text.literal("Death reason: "+deathTableList.get(i).getReason()))
                     .addLoreLine(Text.literal("World: "+deathTableList.get(i).getWorld()))
                     .addLoreLine(Text.literal("Place: "+deathTableList.get(i).getPlace()))
+                    .addLoreLine(Text.literal("XpLevel: "+deathTableList.get(i).getXp()))
                     .setCallback((index, type, action) -> {
                         List<ItemStack> itemStackList = TableListGui.inventorySerialization(inventory, armor, offHand);
-                         new InventoryGui(player, deathTableList.getFirst().getName(), itemStackList).open();
+                         new InventoryGui(player, deathTableList.getFirst().getName(), itemStackList, xp).open();
                     })
                     .build());
         }
+        System.out.println(TableListGui.activeTables);
     }
 
     public void setDeathTableList(List<DeathTable> deathTableList){
@@ -95,9 +98,9 @@ public class DeathHistoryGui extends SimpleGui {
 
     private int getCurrentIndex(int guiListSize){
         String playerName = player.getName().getString();
-        int currentIndex = playerIndices.getOrDefault(playerName, 1);
+        int currentIndex = playerIndices.getOrDefault(playerName, 0);
         currentIndex--;
-        if (currentIndex < 1) {
+        if (currentIndex < 0) {
             currentIndex = guiListSize - 1;
             return currentIndex;
         }

@@ -43,7 +43,7 @@ public class OnPlayerLoginMixin {
         String armorString = armor.toString();
         String offHandString = offHand.toString();
 
-        float xp = player.getXpToDrop(player.getServer().getOverworld(), player);
+        int xp = player.experienceLevel;
 
         try {
             BorukvaInventoryBackup.getBorukvaDeathBackupDB()

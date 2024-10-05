@@ -23,13 +23,13 @@ import java.util.UUID;
 
 public class InventoryGui extends SimpleGui {
 
-    public InventoryGui(ServerPlayerEntity player, String playerName, List<ItemStack> itemStackList) {
+    public InventoryGui(ServerPlayerEntity player, String playerName, List<ItemStack> itemStackList, int xp) {
         super(ScreenHandlerType.GENERIC_9X6, player, false);
 
-        addItems(itemStackList, playerName);
+        addItems(itemStackList, xp, playerName);
     }
 
-    private void addItems(List<ItemStack> itemStackList, String playerName){
+    private void addItems(List<ItemStack> itemStackList, int xp, String playerName){
         int i = 0;
         for(ItemStack item: itemStackList){
             this.setSlot(i, new GuiElementBuilder(item.getItem())
@@ -43,10 +43,18 @@ public class InventoryGui extends SimpleGui {
                     UUID uuid = getOfflinePlayerProfile(playerName, player.getServer());
 
                     if(this.player.getServer().getPlayerManager().getPlayer(playerName) != null){
-                        backUpPlayerItems(itemStackList, this.player.getServer().getPlayerManager().getPlayer(playerName));
+                        backUpPlayerItems(itemStackList, xp,this.player.getServer().getPlayerManager().getPlayer(playerName));
                     } else {
-                        saveOfflinePlayerInventory(uuid, itemStackList);
+                        saveOfflinePlayerInventory(uuid, xp,itemStackList);
                     }
+
+                })
+                .build());
+
+        this.setSlot(52, new GuiElementBuilder(Items.PAPER)
+                .setName(Text.literal("Go back"))
+                .setCallback((index, type, action) -> {
+                    TableListGui.activeTables.get(player.getName().getString()).getFirst().open();
 
                 })
                 .build());
@@ -56,6 +64,8 @@ public class InventoryGui extends SimpleGui {
         if (server == null) return null;
 
         UserCache cache = server.getUserCache();
+
+        if (cache == null) return null;
 
         Optional<GameProfile> optionalGameProfile = cache.findByName(playerName);
 
@@ -67,7 +77,7 @@ public class InventoryGui extends SimpleGui {
     }
 
 
-    private void backUpPlayerItems(List<ItemStack> itemStackList, ServerPlayerEntity player){
+    private void backUpPlayerItems(List<ItemStack> itemStackList, int xp,ServerPlayerEntity player){
         int index = 0;
         PlayerInventory playerInventory = player.getInventory();
         for(ItemStack itemStack: itemStackList){
@@ -79,12 +89,13 @@ public class InventoryGui extends SimpleGui {
                 playerInventory.insertStack(index-5, itemStack);
             }
 
+            player.setExperienceLevel(xp);
             index++;
         }
 
     }
 
-    private void saveOfflinePlayerInventory(UUID uuid, List<ItemStack> itemStackList) {
+    private void saveOfflinePlayerInventory(UUID uuid, int xp,List<ItemStack> itemStackList) {
         File playerDataDir = this.player.getServer().getSavePath(WorldSavePath.PLAYERDATA).toFile();
 
         System.out.println(playerDataDir);
@@ -95,7 +106,7 @@ public class InventoryGui extends SimpleGui {
 
             NbtList inventoryList = nbtCompound.getList("Inventory", 10);
             inventoryList.clear();
-            System.out.println("InventoryList: " + inventoryList);
+
             int index = 0;
             for (ItemStack itemStack : itemStackList) {
                 NbtCompound nbtItem = new NbtCompound();
@@ -115,12 +126,12 @@ public class InventoryGui extends SimpleGui {
                 nbtItem.putString("id", itemStack.getItem().toString());
 
                 inventoryList.add(index, nbtItem);
-                System.out.println(inventoryList);
 
                 index++;
             }
 
             nbtCompound.put("Inventory", inventoryList);
+            nbtCompound.putInt("XpLevel", xp);
             NbtIo.writeCompressed(nbtCompound, file2.toPath());
         } catch (Exception e) {
             BorukvaInventoryBackup.LOGGER.warn(e.getMessage());

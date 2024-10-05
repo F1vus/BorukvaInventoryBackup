@@ -31,7 +31,7 @@ public class BorukvaInventoryBackupDB {
     }
 
     public void addDataDeath(String name, String world, String place,
-                                   String date, String reason, String inventory, String armor, String offHand,float xp) throws SQLException {
+                                   String date, String reason, String inventory, String armor, String offHand,int xp) throws SQLException {
         DeathTable deathTable = new DeathTable();
 
         deleteOldestRecord(name, deathTableDao);
@@ -49,7 +49,7 @@ public class BorukvaInventoryBackupDB {
     }
 
     public void addDataLogin(String name, String world, String place,
-                             String date, String inventory, String armor, String offHand, float xp) throws SQLException{
+                             String date, String inventory, String armor, String offHand, int xp) throws SQLException{
         LoginTable loginTable = new LoginTable();
 
         deleteOldestRecord(name, loginTableDao);
@@ -66,7 +66,7 @@ public class BorukvaInventoryBackupDB {
     }
 
     public void addDataLogout(String name, String world, String place,
-                             String date, String inventory, String armor, String offHand, float xp) throws SQLException{
+                             String date, String inventory, String armor, String offHand, int xp) throws SQLException{
         LogoutTable logoutTable = new LogoutTable();
 
 
@@ -116,6 +116,14 @@ public class BorukvaInventoryBackupDB {
                 dao.delete(oldestRecord);
             }
         }
+    }
+
+    public boolean playerDeathExist(String playerName) throws SQLException{
+        List<DeathTable> results = deathTableDao.queryForEq("name", playerName);
+        if (results != null && !results.isEmpty()) {
+            return true;
+        }
+        return false;
     }
 
 }

@@ -52,8 +52,8 @@ public class DeathTable implements Table {
         this.offHand = offHand;
     }
 
-    @DatabaseField(dataType = DataType.FLOAT)
-    private float xp;
+    @DatabaseField(dataType = DataType.INTEGER)
+    private int xp;
 
     public DeathTable(){
     }
@@ -114,11 +114,11 @@ public class DeathTable implements Table {
         this.inventory = inventory;
     }
 
-    public float getXp() {
+    public int getXp() {
         return xp;
     }
 
-    public void setXp(float xp) {
+    public void setXp(int xp) {
         this.xp = xp;
     }
 

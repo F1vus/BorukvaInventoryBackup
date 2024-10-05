@@ -76,16 +76,19 @@ public class LoginHistoryGui extends SimpleGui {
             String inventory = loginTableList.get(i).getInventory();
             String armor = loginTableList.get(i).getArmor();
             String offHand = loginTableList.get(i).getOffHand();
+            int xp = loginTableList.get(i).getXp();
             this.setSlot(i, new GuiElementBuilder(Items.CHEST)
                     .setName(Text.literal("Time: "+loginTableList.get(i).getDate()))
                     .addLoreLine(Text.literal("World: "+loginTableList.get(i).getWorld()))
                     .addLoreLine(Text.literal("Place: "+loginTableList.get(i).getPlace()))
+                    .addLoreLine(Text.literal("XpLevel: "+loginTableList.get(i).getXp()))
                     .setCallback((index, type, action) -> {
                         List<ItemStack> itemStackList = TableListGui.inventorySerialization(inventory, armor, offHand);
-                        new InventoryGui(player, loginTableList.getFirst().getName(), itemStackList).open();
+                        new InventoryGui(player, loginTableList.getFirst().getName(), itemStackList, xp).open();
                     })
                     .build());
         }
+        System.out.println(TableListGui.activeTables);
     }
 
     public void setLoginTableList(List<LoginTable> loginTableList){
@@ -94,9 +97,9 @@ public class LoginHistoryGui extends SimpleGui {
 
     private int getCurrentIndex(int guiListSize){
         String playerName = player.getName().getString();
-        int currentIndex = playerIndices.getOrDefault(playerName, 1);
+        int currentIndex = playerIndices.getOrDefault(playerName, 0);
         currentIndex--;
-        if (currentIndex < 1) {
+        if (currentIndex < 0) {
             currentIndex = guiListSize - 1;
             return currentIndex;
         }

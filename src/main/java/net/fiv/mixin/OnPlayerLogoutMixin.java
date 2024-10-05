@@ -41,12 +41,11 @@ public class OnPlayerLogoutMixin {
         String armorString = armor.toString();
         String offHandString = offHand.toString();
 
-        float xp = player.getXpToDrop(player.getServer().getOverworld(), player);
+        int xp = player.experienceLevel;
 
         try {
             BorukvaInventoryBackup.getBorukvaDeathBackupDB()
                     .addDataLogout(name, world, place, formattedLoginTime, inventr, armorString, offHandString,xp);
-            LOGGER.info("Information about "+name+" write to DB");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
