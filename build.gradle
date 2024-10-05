@@ -37,6 +37,10 @@ dependencies {
 	implementation 'org.xerial:sqlite-jdbc:3.46.1.0'
 
 	modImplementation include("eu.pb4:sgui:1.6.0+1.21")
+
+	include(modImplementation('me.lucko:fabric-permissions-api:0.3.1'))
+
+	modImplementation 'me.lucko:fabric-permissions-api:0.3.1'
 	
 }
 

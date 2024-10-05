@@ -3,6 +3,7 @@ package net.fiv.commands;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import eu.pb4.sgui.api.gui.SimpleGui;
+import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fiv.BorukvaInventoryBackup;
 import net.fiv.config.ModConfigs;
@@ -37,21 +38,26 @@ public class GetInventoryHistoryCommand {
 
     public static int run(CommandContext<ServerCommandSource> context){
         ServerPlayerEntity player = context.getSource().getPlayer();
-        String playerName = StringArgumentType.getString(context, "player");
-        System.out.println(InventoryGui.getOfflinePlayerProfile(playerName, player.getServer()));
-        try {
-            if (!BorukvaInventoryBackup.getBorukvaDeathBackupDB().playerLoginTableExist(playerName)) {
-                player.sendMessage(Text.literal("Такого гравця не існує"));
+        if (Permissions.check(context.getSource(), "borukva.rollback.permission")) {
+            String playerName = StringArgumentType.getString(context, "player");
+            System.out.println(InventoryGui.getOfflinePlayerProfile(playerName, player.getServer()));
+            try {
+                if (!BorukvaInventoryBackup.getBorukvaDeathBackupDB().playerLoginTableExist(playerName)) {
+                    player.sendMessage(Text.literal("Такого гравця не існує"));
+                    return 0;
+                }
+
+                SimpleGui tableListGui = new TableListGui(player, playerName);
+                tableListGui.open();
+                return 1;
+            } catch (SQLException e){
+                LOGGER.warn(e.getMessage());
                 return 0;
             }
-
-            SimpleGui tableListGui = new TableListGui(player, playerName);
-            tableListGui.open();
-            return 1;
-        } catch (SQLException e){
-            LOGGER.warn(e.getMessage());
-            return 0;
+        } else{
+            context.getSource().sendMessage(Text.literal("Unknown command. Type \"/help\" for help."));
         }
+
 
     }
 
