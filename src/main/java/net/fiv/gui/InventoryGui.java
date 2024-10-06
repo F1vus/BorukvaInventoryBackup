@@ -98,7 +98,7 @@ public class InventoryGui extends SimpleGui {
     private void saveOfflinePlayerInventory(UUID uuid, int xp,List<ItemStack> itemStackList) {
         File playerDataDir = this.player.getServer().getSavePath(WorldSavePath.PLAYERDATA).toFile();
 
-        System.out.println(playerDataDir);
+//        System.out.println(playerDataDir);
         try {
             File file2 = new File(playerDataDir, uuid.toString() + ".dat");
 

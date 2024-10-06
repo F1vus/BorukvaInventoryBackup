@@ -5,8 +5,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.collection.DefaultedList;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -17,9 +15,6 @@ import java.time.LocalDateTime;
 
 @Mixin(PlayerManager.class)
 public class OnPlayerLogoutMixin {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(BorukvaInventoryBackup.MOD_ID);
-
     @Inject(method = "remove", at = @At("HEAD"))
     private void playerRemoveMixin(ServerPlayerEntity player, CallbackInfo ci){
         DefaultedList<ItemStack> inventory = player.getInventory().main;
@@ -44,7 +39,7 @@ public class OnPlayerLogoutMixin {
         int xp = player.experienceLevel;
 
         try {
-            BorukvaInventoryBackup.getBorukvaDeathBackupDB()
+            BorukvaInventoryBackup.getBorukvaInventoryBackupDB()
                     .addDataLogout(name, world, place, formattedLoginTime, inventr, armorString, offHandString,xp);
         } catch (SQLException e) {
             throw new RuntimeException(e);

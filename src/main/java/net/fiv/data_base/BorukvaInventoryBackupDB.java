@@ -120,10 +120,7 @@ public class BorukvaInventoryBackupDB {
 
     public boolean playerLoginTableExist(String playerName) throws SQLException{
         List<LoginTable> results = loginTableDao.queryForEq("name", playerName);
-        if (results != null && !results.isEmpty()) {
-            return true;
-        }
-        return false;
+        return results != null && !results.isEmpty();
     }
 
 }

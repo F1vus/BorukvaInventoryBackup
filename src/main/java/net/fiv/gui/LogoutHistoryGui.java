@@ -2,24 +2,20 @@ package net.fiv.gui;
 
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import eu.pb4.sgui.api.gui.SimpleGui;
-import net.fiv.BorukvaInventoryBackup;
+import lombok.Setter;
 import net.fiv.data_base.entities.LogoutTable;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+@Setter
 public class LogoutHistoryGui extends SimpleGui {
-
-    public static final Logger LOGGER = LoggerFactory.getLogger(BorukvaInventoryBackup.MOD_ID);
-
     private static HashMap<String, Integer> playerIndices = new HashMap<>();
 
     private List<LogoutTable> logoutTableList = new ArrayList<>();
@@ -88,11 +84,7 @@ public class LogoutHistoryGui extends SimpleGui {
                     })
                     .build());
         }
-        System.out.println(TableListGui.activeTables);
-    }
-
-    public void setLogoutTableList(List<LogoutTable> logoutTableList){
-        this.logoutTableList = logoutTableList;
+//        System.out.println(TableListGui.activeTables);
     }
 
     private int getCurrentIndex(int guiListSize){
@@ -105,7 +97,4 @@ public class LogoutHistoryGui extends SimpleGui {
         }
         return currentIndex;
     }
-
-
-
 }

@@ -15,8 +15,6 @@ import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -24,15 +22,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class GetInventoryHistoryCommand {
-
-    public static final Logger LOGGER = LoggerFactory.getLogger(BorukvaInventoryBackup.MOD_ID);
-
     public static void registerCommand() {
-        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
-            dispatcher.register(CommandManager.literal("getInventoryHistory").then(CommandManager
-                    .argument("player", StringArgumentType.string())
-                    .executes(GetInventoryHistoryCommand::run)));
-        });
+        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(CommandManager.literal("getInventoryHistory").then(CommandManager
+                .argument("player", StringArgumentType.string())
+                .executes(GetInventoryHistoryCommand::run))));
     }
 
 
@@ -40,10 +33,12 @@ public class GetInventoryHistoryCommand {
         ServerPlayerEntity player = context.getSource().getPlayer();
         if (Permissions.check(context.getSource(), "borukva.rollback.permission")) {
             String playerName = StringArgumentType.getString(context, "player");
-            System.out.println(InventoryGui.getOfflinePlayerProfile(playerName, player.getServer()));
+//            System.out.println(InventoryGui.getOfflinePlayerProfile(playerName, player.getServer()));
             try {
-                if (!BorukvaInventoryBackup.getBorukvaDeathBackupDB().playerLoginTableExist(playerName)) {
-                    player.sendMessage(Text.literal("Такого гравця не існує"));
+                if (!BorukvaInventoryBackup.getBorukvaInventoryBackupDB().playerLoginTableExist(playerName)) {
+                    if (player != null) {
+                        player.sendMessage(Text.literal("Такого гравця не існує"));
+                    }
                     return 0;
                 }
 
@@ -51,7 +46,7 @@ public class GetInventoryHistoryCommand {
                 tableListGui.open();
                 return 1;
             } catch (SQLException e){
-                LOGGER.warn(e.getMessage());
+                BorukvaInventoryBackup.LOGGER.warn(e.getMessage());
                 return 0;
             }
         } else{
@@ -59,6 +54,7 @@ public class GetInventoryHistoryCommand {
         }
 
 
+        return 0;
     }
 
     public static void addDeathTableMap(ServerPlayerEntity player, String playerName){
@@ -67,7 +63,7 @@ public class GetInventoryHistoryCommand {
 
             double pagesCount = Math.ceil(maxRecords/44.0);
 
-            List<DeathTable> deathTableList = BorukvaInventoryBackup.getBorukvaDeathBackupDB().getDeathData(playerName);
+            List<DeathTable> deathTableList = BorukvaInventoryBackup.getBorukvaInventoryBackupDB().getDeathData(playerName);
 
             List<SimpleGui> simpleGuiLists = new LinkedList<>();
 
@@ -88,8 +84,8 @@ public class GetInventoryHistoryCommand {
             }
 
             TableListGui.activeTables.put(player.getName().getString(), simpleGuiLists);
-        }catch (SQLException e){
-            LOGGER.info(e.getMessage());
+        } catch (SQLException e){
+            BorukvaInventoryBackup.LOGGER.info(e.getMessage());
         }
 
     }
@@ -100,7 +96,7 @@ public class GetInventoryHistoryCommand {
 
             double pagesCount = Math.ceil(maxRecords/44.0);
 
-            List<LogoutTable> logoutTableList = BorukvaInventoryBackup.getBorukvaDeathBackupDB().getLogoutData(playerName);
+            List<LogoutTable> logoutTableList = BorukvaInventoryBackup.getBorukvaInventoryBackupDB().getLogoutData(playerName);
 
             List<SimpleGui> simpleGuiLists = new LinkedList<>();
 
@@ -122,7 +118,7 @@ public class GetInventoryHistoryCommand {
 
             TableListGui.activeTables.put(player.getName().getString(), simpleGuiLists);
         }catch (SQLException e){
-            LOGGER.info(e.getMessage());
+            BorukvaInventoryBackup.LOGGER.info(e.getMessage());
         }
 
     }
@@ -133,7 +129,7 @@ public class GetInventoryHistoryCommand {
 
             double pagesCount = Math.ceil(maxRecords/44.0);
 
-            List<LoginTable> loginTableList = BorukvaInventoryBackup.getBorukvaDeathBackupDB().getLoginData(playerName);
+            List<LoginTable> loginTableList = BorukvaInventoryBackup.getBorukvaInventoryBackupDB().getLoginData(playerName);
 
             List<SimpleGui> simpleGuiLists = new LinkedList<>();
 
@@ -155,7 +151,7 @@ public class GetInventoryHistoryCommand {
 
             TableListGui.activeTables.put(player.getName().getString(), simpleGuiLists);
         }catch (SQLException e){
-            LOGGER.info(e.getMessage());
+            BorukvaInventoryBackup.LOGGER.info(e.getMessage());
         }
 
     }

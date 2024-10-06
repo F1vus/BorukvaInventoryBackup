@@ -7,8 +7,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.collection.DefaultedList;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -19,8 +17,6 @@ import java.time.LocalDateTime;
 
 @Mixin(ServerPlayerEntity.class)
 public class OnPlayerDeathMixin {
-    private static final Logger LOGGER = LoggerFactory.getLogger(BorukvaInventoryBackup.MOD_ID);
-
     @Inject(method = "onDeath", at = @At("HEAD"))
     private void onDeath(DamageSource source, CallbackInfo ci) {
             PlayerEntity player = (PlayerEntity) (Object) this;
@@ -47,7 +43,7 @@ public class OnPlayerDeathMixin {
 
             int xp = player.experienceLevel;
             try {
-                BorukvaInventoryBackup.getBorukvaDeathBackupDB()
+                BorukvaInventoryBackup.getBorukvaInventoryBackupDB()
                         .addDataDeath(name, world, place, formattedDeathTime, deathReason, inventr, armorString, offHandString,xp);
             } catch (SQLException e) {
                 throw new RuntimeException(e);
