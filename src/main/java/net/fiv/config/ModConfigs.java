@@ -1,9 +1,11 @@
 package net.fiv.config;
 
 import com.mojang.datafixers.util.Pair;
+import lombok.Getter;
 import net.fiv.BorukvaInventoryBackup;
 
 public class ModConfigs {
+    @Getter
     public static SimpleConfig CONFIG;
     private static ModConfigProvider configs;
 
@@ -24,7 +26,4 @@ public class ModConfigs {
         configs.addKeyValuePair(new Pair<>("key.borukvaInventoryBackup.MAX_RECORDS", 100), "int");
     }
 
-    public static SimpleConfig getCONFIG(){
-        return CONFIG;
-    }
 }
