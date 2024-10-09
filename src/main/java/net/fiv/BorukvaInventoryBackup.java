@@ -30,7 +30,6 @@ public class BorukvaInventoryBackup implements ModInitializer {
 		ModConfigs.registerConfigs();
 
 		ServerLifecycleEvents.SERVER_STARTING.register(this::onServerStarting);
-
 	}
 
 	private void onServerStarting(MinecraftServer server) {
@@ -49,8 +48,6 @@ public class BorukvaInventoryBackup implements ModInitializer {
 			LOGGER.info("Faild connect to database");
 			throw new RuntimeException("Error initializing database", e);
 		}
-
-		LOGGER.info("initialized");
 	}
 
 }

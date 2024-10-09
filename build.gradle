@@ -31,15 +31,15 @@ dependencies {
 	compileOnly 'org.projectlombok:lombok:1.18.34'
 	annotationProcessor 'org.projectlombok:lombok:1.18.34'
 
-	implementation 'com.j256.ormlite:ormlite-jdbc:6.1'
-	implementation 'com.j256.ormlite:ormlite-core:6.1'
-	implementation 'org.xerial:sqlite-jdbc:3.46.1.0'
+	implementation include('com.j256.ormlite:ormlite-jdbc:6.1')
+	implementation include('com.j256.ormlite:ormlite-core:6.1')
+	implementation include('org.xerial:sqlite-jdbc:3.46.1.0')
 
 	modImplementation include("eu.pb4:sgui:1.6.0+1.21")
 
 	include(modImplementation('me.lucko:fabric-permissions-api:0.3.1'))
 
-	modImplementation 'me.lucko:fabric-permissions-api:0.3.1'
+	modImplementation include('me.lucko:fabric-permissions-api:0.3.1')
 	
 }
 

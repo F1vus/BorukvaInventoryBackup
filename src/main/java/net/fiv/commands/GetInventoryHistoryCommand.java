@@ -31,7 +31,7 @@ public class GetInventoryHistoryCommand {
 
     public static int run(CommandContext<ServerCommandSource> context){
         ServerPlayerEntity player = context.getSource().getPlayer();
-        if (Permissions.check(context.getSource(), "borukva.rollback.permission")) {
+        if (Permissions.check(context.getSource(), "borukva.rollback.permission", 4)) {
             String playerName = StringArgumentType.getString(context, "player");
 //            System.out.println(InventoryGui.getOfflinePlayerProfile(playerName, player.getServer()));
             try {
