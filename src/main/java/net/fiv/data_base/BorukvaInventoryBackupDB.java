@@ -5,6 +5,7 @@ import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
+import net.fiv.BorukvaInventoryBackup;
 import net.fiv.config.ModConfigs;
 import net.fiv.data_base.entities.DeathTable;
 import net.fiv.data_base.entities.LoginTable;
@@ -14,13 +15,14 @@ import net.fiv.data_base.entities.Table;
 import java.sql.SQLException;
 import java.util.List;
 
+
 public class BorukvaInventoryBackupDB {
     private final Dao<DeathTable, String> deathTableDao;
     private final Dao<LoginTable, String> loginTableDao;
     private final Dao<LogoutTable, String> logoutTableDao;
 
     public BorukvaInventoryBackupDB() throws SQLException {
-        ConnectionSource connectionSource = new JdbcConnectionSource("jdbc:sqlite:mods/borukva_death_backup/database.db");
+        ConnectionSource connectionSource = new JdbcConnectionSource("jdbc:sqlite:world/"+BorukvaInventoryBackup.MOD_ID+".db");
         TableUtils.createTableIfNotExists(connectionSource, DeathTable.class);
         TableUtils.createTableIfNotExists(connectionSource, LoginTable.class);
         TableUtils.createTableIfNotExists(connectionSource, LogoutTable.class);
@@ -28,6 +30,8 @@ public class BorukvaInventoryBackupDB {
         deathTableDao = DaoManager.createDao(connectionSource, DeathTable.class);
         loginTableDao = DaoManager.createDao(connectionSource, LoginTable.class);
         logoutTableDao = DaoManager.createDao(connectionSource, LogoutTable.class);
+
+
     }
 
     public void addDataDeath(String name, String world, String place,
@@ -112,11 +116,18 @@ public class BorukvaInventoryBackupDB {
         if(results != null && !results.isEmpty()){
             int maxRecords = ModConfigs.getCONFIG().getOrDefault("key.borukvaInventoryBackup.MAX_RECORDS", 100);
             if (results.size() >= maxRecords) {
-                Table oldestRecord = results.getFirst();
-                dao.delete(oldestRecord);
+                int recordsForDelete = results.size() - maxRecords;
+                int index = 0;
+                while(recordsForDelete >= 0){
+                    Table oldestRecord = results.get(index);
+                    dao.delete(oldestRecord);
+                    index++;
+                    recordsForDelete--;
+                }
             }
         }
     }
+
 
     public boolean playerLoginTableExist(String playerName) throws SQLException{
         List<LoginTable> results = loginTableDao.queryForEq("name", playerName);

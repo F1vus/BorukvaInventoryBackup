@@ -25,12 +25,6 @@ public class TableListGui extends SimpleGui {
         addButtons(playerName);
     }
 
-    @Override
-    public boolean canPlayerClose() {
-        //activeTables.remove(this.player.getName().getString());
-        return true;
-    }
-
     private void addButtons(String playerName){
         this.setSlot(3, new GuiElementBuilder(Items.CHEST)
                 .setName(Text.literal("Історія входів").formatted(Formatting.GREEN, Formatting.BOLD))
