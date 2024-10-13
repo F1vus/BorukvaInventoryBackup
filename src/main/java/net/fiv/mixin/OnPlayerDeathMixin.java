@@ -2,9 +2,11 @@ package net.fiv.mixin;
 
 import net.fiv.BorukvaInventoryBackup;
 
+import net.fiv.gui.InventoryGui;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.collection.DefaultedList;
 import org.spongepowered.asm.mixin.Mixin;
@@ -14,6 +16,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 @Mixin(ServerPlayerEntity.class)
 public class OnPlayerDeathMixin {
@@ -23,7 +28,8 @@ public class OnPlayerDeathMixin {
 
             DefaultedList<ItemStack> inventory = player.getInventory().main;
             DefaultedList<ItemStack> armor = player.getInventory().armor;
-            ItemStack offHand = player.getOffHandStack();
+            List<ItemStack> offHand = new ArrayList<>();
+            offHand.add(player.getOffHandStack());
 
             double x = player.getX();
             double y = player.getY();
@@ -37,9 +43,10 @@ public class OnPlayerDeathMixin {
             String formattedDeathTime = deathTime.replace("T", " ").split("\\.")[0];
 
             String deathReason = source.getName();
-            String inventr = inventory.toString();
-            String armorString = armor.toString();
-            String offHandString = offHand.toString();
+
+            String inventr = InventoryGui.playerItems(inventory, player).toString();
+            String armorString = InventoryGui.playerItems(armor, player).toString();
+            String offHandString = InventoryGui.playerItems(offHand, player).toString();
 
             int xp = player.experienceLevel;
             try {

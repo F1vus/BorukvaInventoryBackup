@@ -1,7 +1,9 @@
 package net.fiv.mixin;
 
 import net.fiv.BorukvaInventoryBackup;
+import net.fiv.gui.InventoryGui;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ConnectedClientData;
@@ -14,6 +16,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Mixin(PlayerManager.class)
 public class OnPlayerLoginMixin {
@@ -22,7 +26,8 @@ public class OnPlayerLoginMixin {
                                     ConnectedClientData clientData, CallbackInfo ci){
         DefaultedList<ItemStack> inventory = player.getInventory().main;
         DefaultedList<ItemStack> armor = player.getInventory().armor;
-        ItemStack offHand = player.getOffHandStack();
+        List<ItemStack> offHand = new ArrayList<>();
+        offHand.add(player.getOffHandStack());
 
         double x = player.getX();
         double y = player.getY();
@@ -35,9 +40,9 @@ public class OnPlayerLoginMixin {
         String loginTime = LocalDateTime.now().toString();
         String formattedLoginTime = loginTime.replace("T", " ").split("\\.")[0];
 
-        String inventr = inventory.toString();
-        String armorString = armor.toString();
-        String offHandString = offHand.toString();
+        String inventr = InventoryGui.playerItems(inventory, player).toString();
+        String armorString = InventoryGui.playerItems(armor, player).toString();
+        String offHandString = InventoryGui.playerItems(offHand, player).toString();
 
         int xp = player.experienceLevel;
 

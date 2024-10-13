@@ -10,9 +10,7 @@ import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 @Setter
 public class DeathHistoryGui extends SimpleGui {
@@ -81,7 +79,7 @@ public class DeathHistoryGui extends SimpleGui {
                     .addLoreLine(Text.literal("Place: "+deathTableList.get(i).getPlace()))
                     .addLoreLine(Text.literal("XpLevel: "+deathTableList.get(i).getXp()))
                     .setCallback((index, type, action) -> {
-                        List<ItemStack> itemStackList = TableListGui.inventorySerialization(inventory, armor, offHand);
+                         Map<Integer, ItemStack> itemStackList = TableListGui.inventorySerialization(inventory, armor, offHand, player);
                          new InventoryGui(player, deathTableList.getFirst().getName(), itemStackList, xp).open();
                     })
                     .build());

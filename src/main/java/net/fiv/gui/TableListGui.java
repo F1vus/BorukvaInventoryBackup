@@ -1,18 +1,34 @@
 package net.fiv.gui;
 
+import com.google.common.base.Strings;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.fiv.commands.GetInventoryHistoryCommand;
+import net.fiv.util.InventorySerializer;
+import net.minecraft.client.util.InputUtil;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.NbtList;
+import net.minecraft.predicate.item.EnchantmentsPredicate;
+import net.minecraft.registry.BuiltinRegistries;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
+import net.minecraft.world.World;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 public class TableListGui extends SimpleGui {
 
@@ -63,29 +79,80 @@ public class TableListGui extends SimpleGui {
                 .build());
     }
 
-    protected static List<ItemStack> inventorySerialization(String inventory, String armor, String offHand){
-        List<ItemStack> itemsToGive = new ArrayList<>();
+    protected static Map<Integer, ItemStack> inventorySerialization(String inventory, String armor, String offHand, ServerPlayerEntity player){
+        World world = player.getWorld();
 
-        String inventory1 = inventory.replace("[", "");
-        String inventory2 = inventory1.replace("]", "");
-        String armor1 = armor.replace("[", "");
-        String armor2 = armor1.replace("]", "");
+        Map<Integer, ItemStack> itemsToGive = new HashMap<>();
 
-        List<String> items = new ArrayList<>(List.of(inventory2.split(", ")));
-        List<String> armors = new ArrayList<>(List.of(armor2.split(", ")));
+        NbtCompound nbtCompound = InventorySerializer.deserializeInventory(armor);
+        System.out.println("armor: "+armor);
+        NbtList nbtList = nbtCompound.getList("Inventory", 10);
 
-        for(String armorTag: armors){
-            String[] tagAndNumber = armorTag.split(" ");
+        int index=0;
+        for(NbtElement nbtElement: nbtList){
+            NbtCompound itemNbt = (NbtCompound)nbtElement;
+            ItemStack itemStack;
+            System.out.println("BLOCKTAG: "+itemNbt.getString("id")); //
+            if(itemNbt.contains("components")){
 
-            itemsToGive.add(new ItemStack(Registries.ITEM.get(Identifier.of(tagAndNumber[1])), Integer.parseInt(tagAndNumber[0])));
+                itemStack = ItemStack.fromNbt(world.getRegistryManager(), nbtElement).get();
+
+            } else if(Registries.ITEM.get(Identifier.of(itemNbt.getString("id"))).equals(Items.AIR)){
+                itemStack = new ItemStack(Items.AIR);
+            } else{
+                itemStack = new ItemStack(Registries.ITEM.get(Identifier.of(itemNbt.getString("id"))), itemNbt.getInt("Count"));
+            }
+
+            itemsToGive.put(index, itemStack);
+            index++;
         }
 
-        String[] offHandItem = offHand.split(" ");
-        itemsToGive.add(new ItemStack(Registries.ITEM.get(Identifier.of(offHandItem[1])), Integer.parseInt(offHandItem[0])));
+        NbtCompound nbtCompoundOffHand = InventorySerializer.deserializeInventory(offHand);
+        System.out.println("OffHand: "+nbtCompoundOffHand);
+        NbtList nbtListOffHand = nbtCompoundOffHand.getList("Inventory", 10);
 
-        for(String item: items){
-            String[] tagAndNumber = item.split(" ");
-            itemsToGive.add(new ItemStack(Registries.ITEM.get(Identifier.of(tagAndNumber[1])), Integer.parseInt(tagAndNumber[0])));
+        for(NbtElement nbtElement: nbtListOffHand){
+            NbtCompound itemNbt = (NbtCompound)nbtElement;
+            System.out.println(itemNbt);
+            ItemStack itemStack;
+
+            System.out.println("BLOCKTAG: "+itemNbt.getString("id")); //
+            if(itemNbt.contains("components")){
+
+                itemStack = ItemStack.fromNbt(world.getRegistryManager(), nbtElement).get();
+            } else if(Registries.ITEM.get(Identifier.of(itemNbt.getString("id"))).equals(Items.AIR)){
+                itemStack = new ItemStack(Items.AIR);
+
+            }else {
+                itemStack = new ItemStack(Registries.ITEM.get(Identifier.of(itemNbt.getString("id"))), itemNbt.getInt("Count"));
+            }
+
+            itemsToGive.put(index, itemStack);
+            index++;
+        }
+
+
+        NbtCompound nbtCompoundArmor = InventorySerializer.deserializeInventory(inventory);
+        NbtList nbtListArmor = nbtCompoundArmor.getList("Inventory", 10);
+        System.out.println("inv: "+inventory);
+
+        for(NbtElement nbtElement: nbtListArmor){
+            NbtCompound itemNbt = (NbtCompound)nbtElement;
+            System.out.println(itemNbt);
+            ItemStack itemStack;
+
+            System.out.println("BLOCKTAG: "+itemNbt.getString("id")); //
+            if(itemNbt.contains("components")){
+                itemStack = ItemStack.fromNbt(world.getRegistryManager(), nbtElement).get();
+            } else if(Registries.ITEM.get(Identifier.of(itemNbt.getString("id"))).equals(Items.AIR)){
+                itemStack = new ItemStack(Items.AIR);;
+
+            }else {
+                itemStack = new ItemStack(Registries.ITEM.get(Identifier.of(itemNbt.getString("id"))), itemNbt.getInt("Count"));
+            }
+
+            itemsToGive.put(index, itemStack);
+            index++;
         }
 
         return itemsToGive;

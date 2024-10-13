@@ -10,9 +10,7 @@ import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 @Setter
 public class LoginHistoryGui extends SimpleGui {
@@ -80,7 +78,7 @@ public class LoginHistoryGui extends SimpleGui {
                     .addLoreLine(Text.literal("Place: "+loginTableList.get(i).getPlace()))
                     .addLoreLine(Text.literal("XpLevel: "+loginTableList.get(i).getXp()))
                     .setCallback((index, type, action) -> {
-                        List<ItemStack> itemStackList = TableListGui.inventorySerialization(inventory, armor, offHand);
+                        Map<Integer, ItemStack> itemStackList = TableListGui.inventorySerialization(inventory, armor, offHand, player);
                         new InventoryGui(player, loginTableList.getFirst().getName(), itemStackList, xp).open();
                     })
                     .build());
