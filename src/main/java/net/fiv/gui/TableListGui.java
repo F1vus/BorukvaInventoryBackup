@@ -1,24 +1,15 @@
 package net.fiv.gui;
 
-import com.google.common.base.Strings;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.fiv.commands.GetInventoryHistoryCommand;
 import net.fiv.util.InventorySerializer;
-import net.minecraft.client.util.InputUtil;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
-import net.minecraft.predicate.item.EnchantmentsPredicate;
-import net.minecraft.registry.BuiltinRegistries;
 import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
@@ -26,7 +17,6 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
-import java.awt.*;
 import java.util.*;
 import java.util.List;
 
@@ -84,15 +74,17 @@ public class TableListGui extends SimpleGui {
 
         Map<Integer, ItemStack> itemsToGive = new HashMap<>();
 
-        NbtCompound nbtCompound = InventorySerializer.deserializeInventory(armor);
-        System.out.println("armor: "+armor);
-        NbtList nbtList = nbtCompound.getList("Inventory", 10);
+        NbtCompound nbtCompoundArmor = InventorySerializer.deserializeInventory(armor);
+       // System.out.println("armor: "+armor);
+        NbtList nbtListArmor = nbtCompoundArmor.getList("Inventory", 10);
 
-        int index=0;
-        for(NbtElement nbtElement: nbtList){
+        int index = 0;
+        for(NbtElement nbtElement: nbtListArmor){
             NbtCompound itemNbt = (NbtCompound)nbtElement;
+
+            //System.out.println("SlotByte: "+itemNbt.getByte("Slot"));
             ItemStack itemStack;
-            System.out.println("BLOCKTAG: "+itemNbt.getString("id")); //
+            //System.out.println("BLOCKTAG: "+itemNbt.getString("id")); //
             if(itemNbt.contains("components")){
 
                 itemStack = ItemStack.fromNbt(world.getRegistryManager(), nbtElement).get();
@@ -108,15 +100,19 @@ public class TableListGui extends SimpleGui {
         }
 
         NbtCompound nbtCompoundOffHand = InventorySerializer.deserializeInventory(offHand);
-        System.out.println("OffHand: "+nbtCompoundOffHand);
+       // System.out.println("OffHand: "+nbtCompoundOffHand);
         NbtList nbtListOffHand = nbtCompoundOffHand.getList("Inventory", 10);
+
 
         for(NbtElement nbtElement: nbtListOffHand){
             NbtCompound itemNbt = (NbtCompound)nbtElement;
-            System.out.println(itemNbt);
+
+            //System.out.println("SlotByte: "+itemNbt.getByte("Slot"));
+            //System.out.println(itemNbt);
+
             ItemStack itemStack;
 
-            System.out.println("BLOCKTAG: "+itemNbt.getString("id")); //
+            //System.out.println("BLOCKTAG: "+itemNbt.getString("id")); //
             if(itemNbt.contains("components")){
 
                 itemStack = ItemStack.fromNbt(world.getRegistryManager(), nbtElement).get();
@@ -132,20 +128,22 @@ public class TableListGui extends SimpleGui {
         }
 
 
-        NbtCompound nbtCompoundArmor = InventorySerializer.deserializeInventory(inventory);
-        NbtList nbtListArmor = nbtCompoundArmor.getList("Inventory", 10);
-        System.out.println("inv: "+inventory);
+        NbtCompound nbtCompoundInventory = InventorySerializer.deserializeInventory(inventory);
+        NbtList nbtListInventory = nbtCompoundInventory.getList("Inventory", 10);
+       // System.out.println("inv: "+inventory);
 
-        for(NbtElement nbtElement: nbtListArmor){
+        for(NbtElement nbtElement: nbtListInventory){
             NbtCompound itemNbt = (NbtCompound)nbtElement;
-            System.out.println(itemNbt);
+
+            //System.out.println("SlotByte: "+itemNbt.getByte("Slot"));
+            //System.out.println(itemNbt);
             ItemStack itemStack;
 
-            System.out.println("BLOCKTAG: "+itemNbt.getString("id")); //
+            //System.out.println("BLOCKTAG: "+itemNbt.getString("id")); //
             if(itemNbt.contains("components")){
                 itemStack = ItemStack.fromNbt(world.getRegistryManager(), nbtElement).get();
             } else if(Registries.ITEM.get(Identifier.of(itemNbt.getString("id"))).equals(Items.AIR)){
-                itemStack = new ItemStack(Items.AIR);;
+                itemStack = new ItemStack(Items.AIR);
 
             }else {
                 itemStack = new ItemStack(Registries.ITEM.get(Identifier.of(itemNbt.getString("id"))), itemNbt.getInt("Count"));

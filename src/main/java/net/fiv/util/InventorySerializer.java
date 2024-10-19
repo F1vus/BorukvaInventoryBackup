@@ -14,15 +14,15 @@ public class InventorySerializer {
     public static NbtCompound deserializeInventory(String json) {
         NbtCompound inventoryTag = new NbtCompound();
         NbtList inventoryList = new NbtList();
-
-        System.out.println("Json: "+json);
+        //System.out.println("Json: "+json);
         JsonArray jsonArray = gson.fromJson(json, JsonArray.class);
+        //System.out.println("JsonArray: "+jsonArray);
 
         for (int i = 0; i < jsonArray.size(); i++) {
             JsonElement element = jsonArray.get(i);
             if (element.isJsonObject()) {
                 JsonObject itemObject = element.getAsJsonObject();
-                if (itemObject.has("count") && itemObject.has("id") && itemObject.get("count").getAsInt() > 0) { // Only add items with count > 0
+                if (itemObject.has("count") && itemObject.has("id")) { // Only add items with count > 0
                     NbtCompound itemTag = new NbtCompound();
                     itemTag.putByte("Slot", (byte) i);
                     itemTag.putInt("Count", itemObject.get("count").getAsInt());
@@ -41,6 +41,7 @@ public class InventorySerializer {
         }
 
         inventoryTag.put("Inventory", inventoryList);
+        //System.out.println("SeriInvTag: "+inventoryTag);
         return inventoryTag;
     }
 
