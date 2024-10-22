@@ -23,7 +23,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.*;
 
-public class InventoryGui extends SimpleGui {
+public class
+InventoryGui extends SimpleGui {
 
     public InventoryGui(ServerPlayerEntity player, String playerName, Map<Integer, ItemStack> itemStackMap, int xp) {
         super(ScreenHandlerType.GENERIC_9X6, player, false);

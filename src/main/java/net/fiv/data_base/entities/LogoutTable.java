@@ -38,6 +38,18 @@ public class LogoutTable implements Table{
     @DatabaseField(dataType = DataType.INTEGER)
     private int xp;
 
+    public LogoutTable(String name, String world, String place, String date,
+                      String inventory, String armor, String offHand, int xp){
+        this.name = name;
+        this.world = world;
+        this.place = place;
+        this.date = date;
+        this.inventory = inventory;
+        this.armor = armor;
+        this.offHand = offHand;
+        this.xp = xp;
+    }
+
     public LogoutTable(){
     }
 

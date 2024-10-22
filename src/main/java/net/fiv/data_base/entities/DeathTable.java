@@ -41,6 +41,20 @@ public class DeathTable implements Table {
     @DatabaseField(dataType = DataType.INTEGER)
     private int xp;
 
+    public DeathTable(String name, String world, String place, String date,
+                      String reason, String inventory, String armor, String offHand, int xp){
+        this.name = name;
+        this.world = world;
+        this.place = place;
+        this.date = date;
+        this.reason = reason;
+        this.inventory = inventory;
+        this.armor = armor;
+        this.offHand = offHand;
+        this.xp = xp;
+    }
+
+
     public DeathTable(){
     }
 

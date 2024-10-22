@@ -30,60 +30,36 @@ public class BorukvaInventoryBackupDB {
         deathTableDao = DaoManager.createDao(connectionSource, DeathTable.class);
         loginTableDao = DaoManager.createDao(connectionSource, LoginTable.class);
         logoutTableDao = DaoManager.createDao(connectionSource, LogoutTable.class);
-
-
+        
     }
 
     public void addDataDeath(String name, String world, String place,
                                    String date, String reason, String inventory, String armor, String offHand,int xp) throws SQLException {
-        DeathTable deathTable = new DeathTable();
 
         deleteOldestRecord(name, deathTableDao);
 
-        deathTable.setName(name);
-        deathTable.setWorld(world);
-        deathTable.setPlace(place);
-        deathTable.setDate(date);
-        deathTable.setReason(reason);
-        deathTable.setInventory(inventory);
-        deathTable.setArmor(armor);
-        deathTable.setOffHand(offHand);
-        deathTable.setXp(xp);
+        DeathTable deathTable = new DeathTable(name, world, place, date, reason, inventory, armor, offHand, xp);
+
         deathTableDao.create(deathTable);
     }
 
     public void addDataLogin(String name, String world, String place,
                              String date, String inventory, String armor, String offHand, int xp) throws SQLException{
-        LoginTable loginTable = new LoginTable();
 
         deleteOldestRecord(name, loginTableDao);
 
-        loginTable.setName(name);
-        loginTable.setWorld(world);
-        loginTable.setPlace(place);
-        loginTable.setDate(date);
-        loginTable.setInventory(inventory);
-        loginTable.setArmor(armor);
-        loginTable.setOffHand(offHand);
-        loginTable.setXp(xp);
+        LoginTable loginTable = new LoginTable(name , world, place, date, inventory, armor, offHand, xp);
+
         loginTableDao.create(loginTable);
     }
 
     public void addDataLogout(String name, String world, String place,
                              String date, String inventory, String armor, String offHand, int xp) throws SQLException{
-        LogoutTable logoutTable = new LogoutTable();
-
 
         deleteOldestRecord(name, logoutTableDao);
 
-        logoutTable.setName(name);
-        logoutTable.setWorld(world);
-        logoutTable.setPlace(place);
-        logoutTable.setDate(date);
-        logoutTable.setInventory(inventory);
-        logoutTable.setArmor(armor);
-        logoutTable.setOffHand(offHand);
-        logoutTable.setXp(xp);
+        LogoutTable logoutTable = new LogoutTable(name, world, place, date, inventory, armor, offHand, xp);
+
         logoutTableDao.create(logoutTable);
     }
 
