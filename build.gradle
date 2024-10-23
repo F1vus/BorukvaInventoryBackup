@@ -12,6 +12,9 @@ base {
 
 repositories {
 	maven { url 'https://maven.nucleoid.xyz' }
+	maven { url = "https://repo.akka.io/maven/" }
+	maven { url = "https://jitpack.io" }
+	maven { url = "https://mvnrepository.com/artifact/org.scala-lang/scala3-library" }
 	mavenCentral()
 }
 
@@ -28,20 +31,28 @@ dependencies {
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
+	// lombok
 	compileOnly 'org.projectlombok:lombok:1.18.34'
 	annotationProcessor 'org.projectlombok:lombok:1.18.34'
 
+	// Config
+//	implementation 'com.google.code.gson:gson:2.10.1'
+
+	// sqlite and orm
 	implementation include('com.j256.ormlite:ormlite-jdbc:6.1')
 	implementation include('com.j256.ormlite:ormlite-core:6.1')
 	implementation include('org.xerial:sqlite-jdbc:3.46.1.0')
 
-	modImplementation include("eu.pb4:sgui:1.6.0+1.21")
+	// Akka actors
+	include (implementation 'com.typesafe.akka:akka-actor_3:2.9.4')
+	include (implementation 'com.typesafe.akka:akka-actor-typed_3:2.9.4')
+	include (implementation 'com.typesafe:config:1.4.3')
+	include (implementation 'org.scala-lang:scala3-library_3:3.3.3')
+	include (implementation "org.scala-lang.modules:scala-java8-compat_2.13:1.0.2")
 
+	modImplementation include("eu.pb4:sgui:1.6.0+1.21")
 	include(modImplementation('me.lucko:fabric-permissions-api:0.3.1'))
 
-	modImplementation include('me.lucko:fabric-permissions-api:0.3.1')
-
-	implementation 'com.google.code.gson:gson:2.10.1'
 	
 }
 
