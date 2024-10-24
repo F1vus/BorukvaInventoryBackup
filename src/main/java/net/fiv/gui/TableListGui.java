@@ -35,23 +35,15 @@ public class TableListGui extends SimpleGui {
         this.setSlot(3, new GuiElementBuilder(Items.CHEST)
                 .setName(Text.literal("Історія входів").formatted(Formatting.GREEN, Formatting.BOLD))
                 .setCallback((index, type, action) -> {
-                    GetInventoryHistoryCommand.addLoginTableMap(player, playerName);
-                    LoginHistoryGui loginHistoryGui = (LoginHistoryGui) activeTables.get(this.player.getName().getString()).getFirst();
-
-                    loginHistoryGui.addButtons();
-                    loginHistoryGui.open();
-                        })
+                    GetInventoryHistoryCommand.getLoginTableMap(player, playerName);
+                })
 
                 .build());
 
         this.setSlot(4, new GuiElementBuilder(Items.CHEST)
                 .setName(Text.literal("Історія виходів").formatted(Formatting.YELLOW, Formatting.BOLD))
                 .setCallback((index, type, action) -> {
-                    GetInventoryHistoryCommand.addLogoutTableMap(player, playerName);
-                    LogoutHistoryGui logoutHistoryGui = (LogoutHistoryGui) activeTables.get(this.player.getName().getString()).getFirst();
-
-                    logoutHistoryGui.addButtons();
-                    logoutHistoryGui.open();
+                    GetInventoryHistoryCommand.getLogoutTableMap(player, playerName);
                 })
 
                 .build());
@@ -59,11 +51,7 @@ public class TableListGui extends SimpleGui {
         this.setSlot(5, new GuiElementBuilder(Items.CHEST)
                 .setName(Text.literal("Історія смертей").formatted(Formatting.RED, Formatting.BOLD))
                 .setCallback((index, type, action) -> {
-                    GetInventoryHistoryCommand.addDeathTableMap(player, playerName);
-                    DeathHistoryGui deathHistoryGui = (DeathHistoryGui) activeTables.get(this.player.getName().getString()).getFirst();
-
-                    deathHistoryGui.addButtons();
-                    deathHistoryGui.open();
+                    GetInventoryHistoryCommand.getDeathTableMap(player, playerName);
                 })
 
                 .build());

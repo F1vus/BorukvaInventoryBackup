@@ -25,7 +25,6 @@ public class LogoutHistoryGui extends SimpleGui {
 
     @Override
     public boolean canPlayerClose() {
-        TableListGui.activeTables.remove(this.player.getName().getString());
         return true;
     }
 
