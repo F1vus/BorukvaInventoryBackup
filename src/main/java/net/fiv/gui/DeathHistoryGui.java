@@ -15,12 +15,17 @@ import java.util.*;
 @Setter
 public class DeathHistoryGui extends SimpleGui {
 
-    private static HashMap<String, Integer> playerIndices = new HashMap<>();
+    private int page;
 
-    private List<DeathTable> deathTableList = new ArrayList<>();
+    private List<DeathTable> deathTableList;
 
-    public DeathHistoryGui(ServerPlayerEntity player) {
+    public DeathHistoryGui(ServerPlayerEntity player, int page, List<DeathTable> deathTables) {
         super(ScreenHandlerType.GENERIC_9X6, player, false);
+
+        this.deathTableList = deathTables;
+        this.page = page;
+
+        addButtons();
 
     }
 
@@ -30,71 +35,49 @@ public class DeathHistoryGui extends SimpleGui {
     }
 
 
-    public void addButtons(){
-        this.setSlot(53, new GuiElementBuilder(Items.ARMOR_STAND)
-                .setName(Text.literal("NextPage"))
-                .setCallback((index, type, action) -> {
-                    List<SimpleGui> guiList = TableListGui.activeTables.get(player.getName().getString());
-                    if (guiList != null && !guiList.isEmpty()) {
-                        String playerName = player.getName().getString();
+    private void addButtons(){
+        int firstIndex = this.page * 45;
+        int lastIndex = Math.min(firstIndex + 45, this.deathTableList.size());
 
-                        int currentIndex = getCurrentIndex(guiList.size());
-                        playerIndices.put(playerName, currentIndex);
+        for(int i=firstIndex; i<lastIndex; i++){
+            int inventory_index = i-firstIndex;
 
-                        DeathHistoryGui deathHistoryGui = (DeathHistoryGui) guiList.get(currentIndex);
-                        deathHistoryGui.addButtons();
-                        deathHistoryGui.open();
-                    }
-                })
-                .build());
-
-        this.setSlot(52, new GuiElementBuilder(Items.ARMOR_STAND)
-                .setName(Text.literal("PreviousPage"))
-                .setCallback((index, type, action) -> {
-                    List<SimpleGui> guiList = TableListGui.activeTables.get(player.getName().getString());
-                    if (guiList != null && !guiList.isEmpty()) {
-                        String playerName = player.getName().getString();
-
-                        int currentIndex = getCurrentIndex(guiList.size());
-                        playerIndices.put(playerName, currentIndex);
-
-                        DeathHistoryGui deathHistoryGui = (DeathHistoryGui) guiList.get(currentIndex);
-                        deathHistoryGui.addButtons();
-                        deathHistoryGui.open();
-                    }
-                })
-                .build());
-
-
-        for(int i=0; i<deathTableList.size(); i++){
-            String inventory = deathTableList.get(i).getInventory();
-            String armor = deathTableList.get(i).getArmor();
-            String offHand = deathTableList.get(i).getOffHand();
-            int xp = deathTableList.get(i).getXp();
-            this.setSlot(i, new GuiElementBuilder(Items.CHEST)
-                    .setName(Text.literal("Time: "+deathTableList.get(i).getDate()))
-                    .addLoreLine(Text.literal("Death reason: "+deathTableList.get(i).getReason()))
-                    .addLoreLine(Text.literal("World: "+deathTableList.get(i).getWorld()))
-                    .addLoreLine(Text.literal("Place: "+deathTableList.get(i).getPlace()))
-                    .addLoreLine(Text.literal("XpLevel: "+deathTableList.get(i).getXp()))
+            String inventory = this.deathTableList.get(inventory_index).getInventory();
+            String armor = this.deathTableList.get(inventory_index).getArmor();
+            String offHand = this.deathTableList.get(inventory_index).getOffHand();
+            int xp = this.deathTableList.get(inventory_index).getXp();
+            this.setSlot(inventory_index, new GuiElementBuilder(Items.CHEST)
+                    .setName(Text.literal("Time: "+this.deathTableList.get(inventory_index).getDate()))
+                    .addLoreLine(Text.literal("Death reason: "+this.deathTableList.get(inventory_index).getReason()))
+                    .addLoreLine(Text.literal("World: "+this.deathTableList.get(inventory_index).getWorld()))
+                    .addLoreLine(Text.literal("Place: "+this.deathTableList.get(inventory_index).getPlace()))
+                    .addLoreLine(Text.literal("XpLevel: "+this.deathTableList.get(inventory_index).getXp()))
                     .setCallback((index, type, action) -> {
-                         Map<Integer, ItemStack> itemStackList = TableListGui.inventorySerialization(inventory, armor, offHand, player);
-                         new InventoryGui(player, deathTableList.getFirst().getName(), itemStackList, xp).open();
+                        Map<Integer, ItemStack> itemStackList = TableListGui.inventorySerialization(inventory, armor, offHand, player);
+                        new InventoryGui(player, this.deathTableList.getFirst().getName(), itemStackList, xp).open();
+                    })
+                    .build());
+            if(inventory_index>45) break;
+        }
+
+        if (lastIndex < deathTableList.size()) {
+            this.setSlot(53, new GuiElementBuilder(Items.ARROW)
+                    .setName(Text.literal("Next Page"))
+                    .setCallback((index, type, action) -> {
+                        new DeathHistoryGui(player, page + 1, this.deathTableList).open();
+                    })
+                    .build());
+        }
+
+        if (page > 0) {
+            this.setSlot(45, new GuiElementBuilder(Items.ARROW)
+                    .setName(Text.literal("Previous Page"))
+                    .setCallback((index, type, action) -> {
+                        new DeathHistoryGui(player, page - 1, this.deathTableList).open();
                     })
                     .build());
         }
 //        System.out.println(TableListGui.activeTables);
-    }
-
-    private int getCurrentIndex(int guiListSize){
-        String playerName = player.getName().getString();
-        int currentIndex = playerIndices.getOrDefault(playerName, 0);
-        currentIndex--;
-        if (currentIndex < 0) {
-            currentIndex = guiListSize - 1;
-            return currentIndex;
-        }
-        return currentIndex;
     }
 
 }

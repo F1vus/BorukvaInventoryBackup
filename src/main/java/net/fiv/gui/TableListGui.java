@@ -18,11 +18,9 @@ import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
 import java.util.*;
-import java.util.List;
 
 public class TableListGui extends SimpleGui {
 
-    public static HashMap<String, List<SimpleGui>> activeTables = new HashMap<>();
 
     public TableListGui(ServerPlayerEntity player, String playerName) {
         super(ScreenHandlerType.GENERIC_9X1, player, false);
@@ -52,6 +50,7 @@ public class TableListGui extends SimpleGui {
                 .setName(Text.literal("Історія смертей").formatted(Formatting.RED, Formatting.BOLD))
                 .setCallback((index, type, action) -> {
                     GetInventoryHistoryCommand.getDeathTableMap(player, playerName);
+
                 })
 
                 .build());

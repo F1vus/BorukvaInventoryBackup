@@ -54,14 +54,6 @@ InventoryGui extends SimpleGui {
 
                 })
                 .build());
-
-        this.setSlot(52, new GuiElementBuilder(Items.PAPER)
-                .setName(Text.literal("Go back"))
-                .setCallback((index, type, action) -> {
-                    TableListGui.activeTables.get(player.getName().getString()).getFirst().open();
-
-                })
-                .build());
     }
 
     public static UUID getOfflinePlayerProfile(String playerName, MinecraftServer server) {

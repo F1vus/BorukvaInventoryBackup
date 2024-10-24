@@ -14,14 +14,17 @@ import java.util.*;
 
 @Setter
 public class LoginHistoryGui extends SimpleGui {
+    private int page;
 
-    private static HashMap<String, Integer> playerIndices = new HashMap<>();
+    private List<LoginTable> loginTableList;
 
-    private List<LoginTable> loginTableList = new ArrayList<>();
-
-    public LoginHistoryGui(ServerPlayerEntity player) {
+    public LoginHistoryGui(ServerPlayerEntity player, int page, List<LoginTable> loginTables) {
         super(ScreenHandlerType.GENERIC_9X6, player, false);
 
+        this.loginTableList = loginTables;
+        this.page = page;
+
+        addButtons();
     }
 
     @Override
@@ -31,69 +34,48 @@ public class LoginHistoryGui extends SimpleGui {
 
 
     public void addButtons(){
-        this.setSlot(53, new GuiElementBuilder(Items.ARMOR_STAND)
-                .setName(Text.literal("NextPage"))
-                .setCallback((index, type, action) -> {
-                    List<SimpleGui> guiList = TableListGui.activeTables.get(player.getName().getString());
-                    if (guiList != null && !guiList.isEmpty()) {
-                        String playerName = player.getName().getString();
+        int firstIndex = this.page * 45;
+        int lastIndex = Math.min(firstIndex + 45, this.loginTableList.size());
 
-                        int currentIndex = getCurrentIndex(guiList.size());
-                        playerIndices.put(playerName, currentIndex);
+        for(int i=0; i<this.loginTableList.size(); i++){
+            int inventory_index = i-firstIndex;
 
-                        LoginHistoryGui loginHistoryGui = (LoginHistoryGui) guiList.get(currentIndex);
-                        loginHistoryGui.addButtons();
-                        loginHistoryGui.open();
-                    }
-                })
-                .build());
-
-        this.setSlot(52, new GuiElementBuilder(Items.ARMOR_STAND)
-                .setName(Text.literal("PreviousPage"))
-                .setCallback((index, type, action) -> {
-                    List<SimpleGui> guiList = TableListGui.activeTables.get(player.getName().getString());
-                    if (guiList != null && !guiList.isEmpty()) {
-                        String playerName = player.getName().getString();
-
-                        int currentIndex = getCurrentIndex(guiList.size());
-                        playerIndices.put(playerName, currentIndex);
-
-                        LoginHistoryGui loginHistoryGui = (LoginHistoryGui) guiList.get(currentIndex);
-                        loginHistoryGui.addButtons();
-                        loginHistoryGui.open();
-                    }
-                })
-                .build());
-
-
-        for(int i=0; i<loginTableList.size(); i++){
-            String inventory = loginTableList.get(i).getInventory();
-            String armor = loginTableList.get(i).getArmor();
-            String offHand = loginTableList.get(i).getOffHand();
-            int xp = loginTableList.get(i).getXp();
-            this.setSlot(i, new GuiElementBuilder(Items.CHEST)
-                    .setName(Text.literal("Time: "+loginTableList.get(i).getDate()))
-                    .addLoreLine(Text.literal("World: "+loginTableList.get(i).getWorld()))
-                    .addLoreLine(Text.literal("Place: "+loginTableList.get(i).getPlace()))
-                    .addLoreLine(Text.literal("XpLevel: "+loginTableList.get(i).getXp()))
+            String inventory = this.loginTableList.get(inventory_index).getInventory();
+            String armor = this.loginTableList.get(inventory_index).getArmor();
+            String offHand = this.loginTableList.get(inventory_index).getOffHand();
+            int xp = this.loginTableList.get(inventory_index).getXp();
+            this.setSlot(inventory_index, new GuiElementBuilder(Items.CHEST)
+                    .setName(Text.literal("Time: "+this.loginTableList.get(inventory_index).getDate()))
+                    .addLoreLine(Text.literal("World: "+this.loginTableList.get(inventory_index).getWorld()))
+                    .addLoreLine(Text.literal("Place: "+this.loginTableList.get(inventory_index).getPlace()))
+                    .addLoreLine(Text.literal("XpLevel: "+this.loginTableList.get(inventory_index).getXp()))
                     .setCallback((index, type, action) -> {
                         Map<Integer, ItemStack> itemStackList = TableListGui.inventorySerialization(inventory, armor, offHand, player);
-                        new InventoryGui(player, loginTableList.getFirst().getName(), itemStackList, xp).open();
+                        new InventoryGui(player, this.loginTableList.getFirst().getName(), itemStackList, xp).open();
+                    })
+                    .build());
+            if(inventory_index>45) break;
+        }
+
+
+        if (lastIndex < this.loginTableList.size()) {
+            this.setSlot(53, new GuiElementBuilder(Items.ARROW)
+                    .setName(Text.literal("Next Page"))
+                    .setCallback((index, type, action) -> {
+                        new LoginHistoryGui(player, page + 1, this.loginTableList).open();
+                    })
+                    .build());
+        }
+
+        if (page > 0) {
+            this.setSlot(45, new GuiElementBuilder(Items.ARROW)
+                    .setName(Text.literal("Previous Page"))
+                    .setCallback((index, type, action) -> {
+                        new LoginHistoryGui(player, page - 1, this.loginTableList).open();
                     })
                     .build());
         }
 //        System.out.println(TableListGui.activeTables);
-    }
-
-    private int getCurrentIndex(int guiListSize){
-        String playerName = player.getName().getString();
-        int currentIndex = playerIndices.getOrDefault(playerName, 0);
-        currentIndex--;
-        if (currentIndex < 0) {
-            currentIndex = guiListSize - 1;
-            return currentIndex;
-        }
-        return currentIndex;
     }
 
 

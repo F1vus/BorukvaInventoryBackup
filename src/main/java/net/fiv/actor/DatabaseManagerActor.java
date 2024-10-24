@@ -2,18 +2,16 @@ package net.fiv.actor;
 
 import akka.actor.AbstractActor;
 import akka.actor.Props;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import lombok.Getter;
 import net.fiv.BorukvaInventoryBackup;
-import net.fiv.config.ModConfigs;
 import net.fiv.data_base.BorukvaInventoryBackupDB;
 import net.fiv.data_base.entities.DeathTable;
 import net.fiv.data_base.entities.LoginTable;
 import net.fiv.data_base.entities.LogoutTable;
 import net.fiv.gui.*;
-import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
@@ -75,8 +73,8 @@ public class DatabaseManagerActor extends AbstractActor {
     public void getInventoryHistory(BActorMessages.GetInventoryHistory msg) {
         CommandContext<ServerCommandSource> context = msg.context();
             try {
-                ServerPlayerEntity player = EntityArgumentType.getPlayer(context, "player");
-                String playerName = player.getName().getString();
+                ServerPlayerEntity player = context.getSource().getPlayer();
+                String playerName = StringArgumentType.getString(context, "player");
                 System.out.println("playerName" + playerName);
 
                 if (!borukvaInventoryBackupDB.playerLoginTableExist(playerName)) {
@@ -88,8 +86,6 @@ public class DatabaseManagerActor extends AbstractActor {
                 tableListGui.open();
             } catch (SQLException e){
                 BorukvaInventoryBackup.LOGGER.warn(e.getMessage());
-            } catch (CommandSyntaxException e) {
-                throw new RuntimeException(e);
             }
     }
 
@@ -197,23 +193,13 @@ public class DatabaseManagerActor extends AbstractActor {
         ServerPlayerEntity player = msg.player();
         String playerName = msg.playerName();
         try{
-            int maxRecords = ModConfigs.getCONFIG().getOrDefault("key.borukvaInventoryBackup.MAX_RECORDS", 100);
-            double pagesCount = Math.ceil(maxRecords/44.0);
             List<DeathTable> deathTableList = borukvaInventoryBackupDB.getDeathData(playerName);
-            List<DeathHistoryGui> simpleGuiLists = new LinkedList<>();
+            if(deathTableList == null){
+                player.sendMessage(Text.literal("В базі смертей немає записів про цього гравця"));
 
-            while(pagesCount > 0){
-                int endIndex = Math.min(44, deathTableList.size());
-                DeathHistoryGui deathHistoryGui = new DeathHistoryGui(player);
-                List<DeathTable> d = new ArrayList<>(deathTableList.subList(0, endIndex));
-                deathHistoryGui.setDeathTableList(d);
-                deathTableList.subList(0, endIndex).clear();
-                simpleGuiLists.add(deathHistoryGui);
-                pagesCount-=1;
+            } else {
+                new DeathHistoryGui(player, 0, deathTableList).open();
             }
-
-            simpleGuiLists.getFirst().addButtons();
-            simpleGuiLists.getFirst().open();
         } catch (SQLException e){
             BorukvaInventoryBackup.LOGGER.info(e.getMessage());
         }
@@ -224,33 +210,10 @@ public class DatabaseManagerActor extends AbstractActor {
         ServerPlayerEntity player = msg.player();
         String playerName = msg.playerName();
         try{
-            int maxRecords = ModConfigs.getCONFIG().getOrDefault("key.borukvaInventoryBackup.MAX_RECORDS", 100);
-
-            double pagesCount = Math.ceil(maxRecords/44.0);
-
             List<LogoutTable> logoutTableList = borukvaInventoryBackupDB.getLogoutData(playerName);
 
-            List<LogoutHistoryGui> simpleGuiLists = new LinkedList<>();
-
-            while(pagesCount > 0){
-                int endIndex = Math.min(44, logoutTableList.size());
-
-                LogoutHistoryGui logoutHistoryGui = new LogoutHistoryGui(player);
-
-                List<LogoutTable> d = new ArrayList<>(logoutTableList.subList(0, endIndex));
-
-                logoutHistoryGui.setLogoutTableList(d);
-
-                logoutTableList.subList(0, endIndex).clear();
-                simpleGuiLists.add(logoutHistoryGui);
-
-                pagesCount-=1;
-
-            }
-
-            simpleGuiLists.getFirst().addButtons();
-            simpleGuiLists.getFirst().open();
-        }catch (SQLException e){
+            new LogoutHistoryGui(player, 0, logoutTableList).open();
+        } catch (SQLException e){
             BorukvaInventoryBackup.LOGGER.info(e.getMessage());
         }
 
@@ -260,24 +223,10 @@ public class DatabaseManagerActor extends AbstractActor {
         ServerPlayerEntity player = msg.player();
         String playerName = msg.playerName();
         try{
-            int maxRecords = ModConfigs.getCONFIG().getOrDefault("key.borukvaInventoryBackup.MAX_RECORDS", 100);
-            double pagesCount = Math.ceil(maxRecords/44.0);
             List<LoginTable> loginTableList = borukvaInventoryBackupDB.getLoginData(playerName);
-            List<LoginHistoryGui> simpleGuiLists = new LinkedList<>();
 
-            while(pagesCount > 0){
-                int endIndex = Math.min(44, loginTableList.size());
-                LoginHistoryGui loginHistoryGui = new LoginHistoryGui(player);
-                List<LoginTable> d = new ArrayList<>(loginTableList.subList(0, endIndex));
-                loginHistoryGui.setLoginTableList(d);
-                loginTableList.subList(0, endIndex).clear();
-                simpleGuiLists.add(loginHistoryGui);
-                pagesCount-=1;
-            }
-
-            simpleGuiLists.getFirst().addButtons();
-            simpleGuiLists.getFirst().open();
-        }   catch (SQLException e){
+            new LoginHistoryGui(player, 0, loginTableList).open();
+        } catch (SQLException e){
             BorukvaInventoryBackup.LOGGER.info(e.getMessage());
         }
 

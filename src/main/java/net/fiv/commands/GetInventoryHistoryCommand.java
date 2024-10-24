@@ -7,7 +7,6 @@ import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fiv.BorukvaInventoryBackup;
 import net.fiv.actor.BActorMessages;
-import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -18,7 +17,7 @@ public class GetInventoryHistoryCommand {
                 CommandManager.literal("getInventoryHistory")
                         .requires(Permissions.require("borukva.rollback.permission", 4))
                         .then(CommandManager
-                                .argument("player", EntityArgumentType.player())
+                                .argument("player", StringArgumentType.string())
                                 .executes(GetInventoryHistoryCommand::getInventoryHistory))));
     }
 

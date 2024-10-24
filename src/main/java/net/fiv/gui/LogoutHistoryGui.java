@@ -14,13 +14,17 @@ import java.util.*;
 
 @Setter
 public class LogoutHistoryGui extends SimpleGui {
-    private static HashMap<String, Integer> playerIndices = new HashMap<>();
+    private int page;
 
-    private List<LogoutTable> logoutTableList = new ArrayList<>();
+    private List<LogoutTable> logoutTableList;
 
-    public LogoutHistoryGui(ServerPlayerEntity player) {
+    public LogoutHistoryGui(ServerPlayerEntity player, int page, List<LogoutTable> logoutTables) {
         super(ScreenHandlerType.GENERIC_9X6, player, false);
 
+        this.logoutTableList = logoutTables;
+        this.page = page;
+
+        addButtons();
     }
 
     @Override
@@ -30,68 +34,47 @@ public class LogoutHistoryGui extends SimpleGui {
 
 
     public void addButtons(){
-        this.setSlot(53, new GuiElementBuilder(Items.ARMOR_STAND)
-                .setName(Text.literal("NextPage"))
-                .setCallback((index, type, action) -> {
-                    List<SimpleGui> guiList = TableListGui.activeTables.get(player.getName().getString());
-                    if (guiList != null && !guiList.isEmpty()) {
-                        String playerName = player.getName().getString();
-
-                        int currentIndex = getCurrentIndex(guiList.size());
-                        playerIndices.put(playerName, currentIndex);
-
-                        LogoutHistoryGui logoutHistoryGui = (LogoutHistoryGui) guiList.get(currentIndex);
-                        logoutHistoryGui.addButtons();
-                        logoutHistoryGui.open();
-                    }
-                })
-                .build());
-
-        this.setSlot(52, new GuiElementBuilder(Items.ARMOR_STAND)
-                .setName(Text.literal("PreviousPage"))
-                .setCallback((index, type, action) -> {
-                    List<SimpleGui> guiList = TableListGui.activeTables.get(player.getName().getString());
-                    if (guiList != null && !guiList.isEmpty()) {
-                        String playerName = player.getName().getString();
-
-                        int currentIndex = getCurrentIndex(guiList.size());
-                        playerIndices.put(playerName, currentIndex);
-
-                        LogoutHistoryGui logoutHistoryGui = (LogoutHistoryGui) guiList.get(currentIndex);
-                        logoutHistoryGui.addButtons();
-                        logoutHistoryGui.open();
-                    }
-                })
-                .build());
-
+        int firstIndex = this.page * 45;
+        int lastIndex = Math.min(firstIndex + 45, this.logoutTableList.size());
 
         for(int i=0; i<logoutTableList.size(); i++){
-            String inventory = logoutTableList.get(i).getInventory();
-            String armor = logoutTableList.get(i).getArmor();
-            String offHand = logoutTableList.get(i).getOffHand();
-            int xp = logoutTableList.get(i).getXp();
-            this.setSlot(i, new GuiElementBuilder(Items.CHEST)
-                    .setName(Text.literal("Time: "+logoutTableList.get(i).getDate()))
-                    .addLoreLine(Text.literal("World: "+logoutTableList.get(i).getWorld()))
-                    .addLoreLine(Text.literal("Place: "+logoutTableList.get(i).getPlace()))
-                    .addLoreLine(Text.literal("XpLevel: "+logoutTableList.get(i).getXp()))
+            int inventory_index = i-firstIndex;
+
+            String inventory = logoutTableList.get(inventory_index).getInventory();
+            String armor = logoutTableList.get(inventory_index).getArmor();
+            String offHand = logoutTableList.get(inventory_index).getOffHand();
+            int xp = logoutTableList.get(inventory_index).getXp();
+            this.setSlot(inventory_index, new GuiElementBuilder(Items.CHEST)
+                    .setName(Text.literal("Time: "+logoutTableList.get(inventory_index).getDate()))
+                    .addLoreLine(Text.literal("World: "+logoutTableList.get(inventory_index).getWorld()))
+                    .addLoreLine(Text.literal("Place: "+logoutTableList.get(inventory_index).getPlace()))
+                    .addLoreLine(Text.literal("XpLevel: "+logoutTableList.get(inventory_index).getXp()))
                     .setCallback((index, type, action) -> {
                         Map<Integer, ItemStack> itemStackList = TableListGui.inventorySerialization(inventory, armor, offHand, player);
                         new InventoryGui(player, logoutTableList.getFirst().getName(), itemStackList, xp).open();
+                    })
+                    .build());
+            if(inventory_index>45) break;
+        }
+
+        if (lastIndex < this.logoutTableList.size()) {
+            this.setSlot(53, new GuiElementBuilder(Items.ARROW)
+                    .setName(Text.literal("Next Page"))
+                    .setCallback((index, type, action) -> {
+                        new LogoutHistoryGui(player, page + 1, this.logoutTableList).open();
+                    })
+                    .build());
+        }
+
+        if (page > 0) {
+            this.setSlot(45, new GuiElementBuilder(Items.ARROW)
+                    .setName(Text.literal("Previous Page"))
+                    .setCallback((index, type, action) -> {
+                        new LogoutHistoryGui(player, page - 1, this.logoutTableList).open();
                     })
                     .build());
         }
 //        System.out.println(TableListGui.activeTables);
     }
 
-    private int getCurrentIndex(int guiListSize){
-        String playerName = player.getName().getString();
-        int currentIndex = playerIndices.getOrDefault(playerName, 0);
-        currentIndex--;
-        if (currentIndex < 0) {
-            currentIndex = guiListSize - 1;
-            return currentIndex;
-        }
-        return currentIndex;
-    }
 }
