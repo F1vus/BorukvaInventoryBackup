@@ -14,7 +14,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 public class GetInventoryHistoryCommand {
     public static void registerCommand() {
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(
-                CommandManager.literal("getInventoryHistory")
+                CommandManager.literal("binvbackup")
                         .requires(Permissions.require("borukva.rollback.permission", 4))
                         .then(CommandManager
                                 .argument("player", StringArgumentType.string())

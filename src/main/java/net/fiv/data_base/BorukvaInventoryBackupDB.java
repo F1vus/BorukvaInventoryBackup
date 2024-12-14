@@ -30,7 +30,7 @@ public class BorukvaInventoryBackupDB {
     private final Dao<LogoutTable, String> logoutTableDao;
 
     public BorukvaInventoryBackupDB() throws SQLException {
-        ConnectionSource connectionSource = new JdbcConnectionSource("jdbc:sqlite:world/"+BorukvaInventoryBackup.MOD_ID+".db");
+        ConnectionSource connectionSource = new JdbcConnectionSource("jdbc:h2:./"+BorukvaInventoryBackup.MOD_ID+".db");
         TableUtils.createTableIfNotExists(connectionSource, DeathTable.class);
         TableUtils.createTableIfNotExists(connectionSource, LoginTable.class);
         TableUtils.createTableIfNotExists(connectionSource, LogoutTable.class);

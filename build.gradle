@@ -41,7 +41,8 @@ dependencies {
 	// sqlite and orm
 	implementation include('com.j256.ormlite:ormlite-jdbc:6.1')
 	implementation include('com.j256.ormlite:ormlite-core:6.1')
-	implementation include('org.xerial:sqlite-jdbc:3.46.1.0')
+//	implementation include('org.xerial:sqlite-jdbc:3.46.1.0')
+	include(implementation 'com.h2database:h2:2.3.232')
 
 	// Akka actors
 	include (implementation 'com.typesafe.akka:akka-actor_3:2.9.4')

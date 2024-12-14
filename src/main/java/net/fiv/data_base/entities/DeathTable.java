@@ -29,7 +29,7 @@ public class DeathTable implements Table {
     @DatabaseField(dataType = DataType.STRING)
     private String reason;
 
-    @DatabaseField(dataType = DataType.STRING)
+    @DatabaseField(dataType = DataType.STRING, width = 100000)
     private String inventory;
 
     @DatabaseField(dataType = DataType.STRING)

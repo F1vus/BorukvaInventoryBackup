@@ -54,17 +54,18 @@ public class DatabaseManagerActor extends AbstractActor {
     }
 
     private void initializeDatabase(BActorMessages.InitializeDatabase msg) {
-        MinecraftServer server = msg.server();
+//        MinecraftServer server = msg.server();
         try {
-            File worldPath = server.getSavePath(WorldSavePath.ROOT).toFile();
-            File dataBaseFile = new File(worldPath, MOD_ID+".db");
-
-            if(dataBaseFile.createNewFile()){
-                BorukvaInventoryBackup.LOGGER.info("DataBase file successfully created!");
-            }
+//            File worldPath = server.getSavePath(WorldSavePath.ROOT).toFile();
+//            File dataBaseFile = new File(worldPath, MOD_ID+".db");
+//
+//            if(dataBaseFile.createNewFile()){
+//                BorukvaInventoryBackup.LOGGER.info("DataBase file successfully created!");
+//            }
 
             borukvaInventoryBackupDB = new BorukvaInventoryBackupDB();
-        } catch (SQLException | IOException e) {
+            BorukvaInventoryBackup.LOGGER.info("DataBase file successfully initialized!");
+        } catch (SQLException e) {
             BorukvaInventoryBackup.LOGGER.info("Faild connect to database");
             throw new RuntimeException("Error initializing database", e);
         }

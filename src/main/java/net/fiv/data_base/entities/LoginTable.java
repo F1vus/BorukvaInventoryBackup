@@ -26,7 +26,7 @@ public class LoginTable implements Table{
     @DatabaseField(dataType = DataType.STRING)
     private String date;
 
-    @DatabaseField(dataType = DataType.STRING)
+    @DatabaseField(dataType = DataType.STRING, width = 100000)
     private String inventory;
 
     @DatabaseField(dataType = DataType.STRING)
