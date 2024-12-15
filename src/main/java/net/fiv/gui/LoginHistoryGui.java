@@ -51,7 +51,7 @@ public class LoginHistoryGui extends SimpleGui {
                     .addLoreLine(Text.literal("XpLevel: "+this.loginTableList.get(inventory_index).getXp()))
                     .setCallback((index, type, action) -> {
                         Map<Integer, ItemStack> itemStackList = TableListGui.inventorySerialization(inventory, armor, offHand, player);
-                        new InventoryGui(player, this.loginTableList.getFirst().getName(), itemStackList, xp).open();
+                        new InventoryGui(player, this.loginTableList.getFirst().getName(), itemStackList, xp, this).open();
                     })
                     .build());
             if(inventory_index>45) break;
@@ -66,6 +66,13 @@ public class LoginHistoryGui extends SimpleGui {
                     })
                     .build());
         }
+
+        this.setSlot(49, new GuiElementBuilder(Items.EMERALD)
+                .setName(Text.literal("Back to tables list"))
+                .setCallback((index, type, action) -> {
+                    new TableListGui(player, loginTableList.getFirst().getName()).open();
+                })
+                .build());
 
         if (page > 0) {
             this.setSlot(45, new GuiElementBuilder(Items.ARROW)

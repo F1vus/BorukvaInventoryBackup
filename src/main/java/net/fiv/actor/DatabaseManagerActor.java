@@ -14,22 +14,15 @@ import net.fiv.data_base.entities.LogoutTable;
 import net.fiv.gui.*;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.item.ItemStack;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
-import net.minecraft.util.WorldSavePath;
 import net.minecraft.util.collection.DefaultedList;
 
-import java.io.File;
-import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-
-import static net.fiv.BorukvaInventoryBackup.MOD_ID;
 
 public class DatabaseManagerActor extends AbstractActor {
     @Getter
@@ -76,7 +69,7 @@ public class DatabaseManagerActor extends AbstractActor {
             try {
                 ServerPlayerEntity player = context.getSource().getPlayer();
                 String playerName = StringArgumentType.getString(context, "player");
-                System.out.println("playerName" + playerName);
+                //System.out.println("playerName" + playerName);
 
                 if (!borukvaInventoryBackupDB.playerLoginTableExist(playerName)) {
                     context.getSource().sendMessage(Text.literal("Такого гравця не існує"));
@@ -129,6 +122,7 @@ public class DatabaseManagerActor extends AbstractActor {
         ServerPlayerEntity player = msg.player();
 
         DefaultedList<ItemStack> inventory = player.getInventory().main;
+        //System.out.println("DefaultedList: "+inventory);
         DefaultedList<ItemStack> armor = player.getInventory().armor;
         List<ItemStack> offHand = new ArrayList<>();
         offHand.add(player.getOffHandStack());
@@ -147,7 +141,7 @@ public class DatabaseManagerActor extends AbstractActor {
         String inventr = InventoryGui.playerItems(inventory, player).toString();
         String armorString = InventoryGui.playerItems(armor, player).toString();
         String offHandString = InventoryGui.playerItems(offHand, player).toString();
-
+        //System.out.println("Inventr:"+inventr);
         int xp = player.experienceLevel;
 
         try {
@@ -225,6 +219,7 @@ public class DatabaseManagerActor extends AbstractActor {
         String playerName = msg.playerName();
         try{
             List<LoginTable> loginTableList = borukvaInventoryBackupDB.getLoginData(playerName);
+            System.out.println("LoginTable: "+loginTableList);
 
             new LoginHistoryGui(player, 0, loginTableList).open();
         } catch (SQLException e){

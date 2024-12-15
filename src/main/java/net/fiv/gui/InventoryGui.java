@@ -16,6 +16,7 @@ import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.UserCache;
 import net.minecraft.util.WorldSavePath;
 
@@ -26,20 +27,23 @@ import java.util.*;
 public class
 InventoryGui extends SimpleGui {
 
-    public InventoryGui(ServerPlayerEntity player, String playerName, Map<Integer, ItemStack> itemStackMap, int xp) {
+    public InventoryGui(ServerPlayerEntity player, String playerName, Map<Integer, ItemStack> itemStackMap, int xp, SimpleGui caller) {
         super(ScreenHandlerType.GENERIC_9X6, player, false);
 
-        addItems(itemStackMap, xp, playerName);
+        addItems(itemStackMap, xp, playerName, caller);
     }
 
 
-    private void addItems(Map<Integer, ItemStack> itemStackMap, int xp, String playerName){
+    private void addItems(Map<Integer, ItemStack> itemStackMap, int xp, String playerName, SimpleGui caller){
         int i = 0;
         for(ItemStack item: itemStackMap.values()){
             this.setSlot(i, new GuiElementBuilder(item.getItem())
+                    .setCount(item.getCount())
                     .build());
             i++;
         }
+
+
 
         this.setSlot(53, new GuiElementBuilder(Items.PAPER)
                 .setName(Text.literal("Backup player inventory"))
@@ -48,9 +52,21 @@ InventoryGui extends SimpleGui {
 
                     if(this.player.getServer().getPlayerManager().getPlayer(playerName) != null){
                         backUpPlayerItems(itemStackMap, xp,this.player.getServer().getPlayerManager().getPlayer(playerName));
+                        this.getPlayer().sendMessage(Text.literal("Ви успішно відновили речі онлайн гравцю!").formatted(Formatting.GREEN, Formatting.BOLD));
                     } else {
                         saveOfflinePlayerInventory(uuid, xp,itemStackMap);
+                        this.getPlayer().sendMessage(Text.literal("Ви успішно відновили речі оффлайн гравцю!").formatted(Formatting.GREEN, Formatting.BOLD));
+
                     }
+
+                })
+                .build());
+
+        this.setSlot(52, new GuiElementBuilder(Items.PAPER)
+                .setName(Text.literal("Return back"))
+                .setItem(Items.EMERALD)
+                .setCallback((index, type, action) -> {
+                    caller.open();
 
                 })
                 .build());
@@ -77,6 +93,7 @@ InventoryGui extends SimpleGui {
 
         int index = 0;
         PlayerInventory playerInventory = player.getInventory();
+        playerInventory.clear();
         //System.out.println("Back: "+itemStackMap);
         for(ItemStack itemStack: itemStackMap.values()){
             if(index < 4){

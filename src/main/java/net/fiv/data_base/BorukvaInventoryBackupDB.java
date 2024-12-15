@@ -3,22 +3,13 @@ package net.fiv.data_base;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
-import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
-import com.mojang.brigadier.arguments.StringArgumentType;
-import com.mojang.brigadier.context.CommandContext;
-import eu.pb4.sgui.api.gui.SimpleGui;
-import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.fiv.BorukvaInventoryBackup;
 import net.fiv.config.ModConfigs;
 import net.fiv.data_base.entities.DeathTable;
 import net.fiv.data_base.entities.LoginTable;
 import net.fiv.data_base.entities.LogoutTable;
 import net.fiv.data_base.entities.Table;
-import net.fiv.gui.TableListGui;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -30,7 +21,9 @@ public class BorukvaInventoryBackupDB {
     private final Dao<LogoutTable, String> logoutTableDao;
 
     public BorukvaInventoryBackupDB() throws SQLException {
-        ConnectionSource connectionSource = new JdbcConnectionSource("jdbc:h2:./"+BorukvaInventoryBackup.MOD_ID+".db");
+        JdbcConnectionSource connectionSource = new JdbcConnectionSource("jdbc:h2:./"+BorukvaInventoryBackup.MOD_ID);
+        connectionSource.setUsername("myUser");
+        connectionSource.setPassword("myPassword");
         TableUtils.createTableIfNotExists(connectionSource, DeathTable.class);
         TableUtils.createTableIfNotExists(connectionSource, LoginTable.class);
         TableUtils.createTableIfNotExists(connectionSource, LogoutTable.class);

@@ -15,7 +15,7 @@ public class OnPlayerLogoutMixin {
     @Inject(method = "remove", at = @At("HEAD"))
     private void onPlayerLogoutMixin(ServerPlayerEntity player, CallbackInfo ci){
         BorukvaInventoryBackup.getDatabaseManagerActor().tell(
-                new BActorMessages.SavePlayerDataOnPlayerConnect(player), ActorRef.noSender());
+                new BActorMessages.SavePlayerDataOnPlayerLogout(player), ActorRef.noSender());
     }
 
 }
