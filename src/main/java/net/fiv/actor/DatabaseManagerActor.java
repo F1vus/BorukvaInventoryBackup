@@ -191,7 +191,7 @@ public class DatabaseManagerActor extends AbstractActor {
         try{
             List<DeathTable> deathTableList = borukvaInventoryBackupDB.getDeathData(playerName);
             if(deathTableList == null){
-                player.sendMessage(Text.literal("В базі смертей немає записів про цього гравця"));
+                player.sendMessage(Text.literal("У базі смертей немає записів про цього гравця"));
 
             } else {
                 new DeathHistoryGui(player, 0, deathTableList).open();
@@ -208,8 +208,13 @@ public class DatabaseManagerActor extends AbstractActor {
         String playerName = msg.playerName();
         try{
             List<LogoutTable> logoutTableList = borukvaInventoryBackupDB.getLogoutData(playerName);
+            if(logoutTableList == null){
+                player.sendMessage(Text.literal("У базі виходів немає записів про цього гравця"));
 
-            new LogoutHistoryGui(player, 0, logoutTableList).open();
+            } else {
+                new LogoutHistoryGui(player, 0, logoutTableList).open();
+            }
+
         } catch (SQLException e){
             BorukvaInventoryBackup.LOGGER.info(e.getMessage());
             throw new SQLExceptionWrapper(e);

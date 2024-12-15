@@ -1,9 +1,7 @@
 package net.fiv.util;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
+import com.google.gson.internal.LazilyParsedNumber;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 
@@ -54,11 +52,31 @@ public class InventorySerializer {
             JsonElement value = componentsObject.get(key);
 
             if (value.isJsonPrimitive()) {
-                if (value.getAsJsonPrimitive().isString()) {
-                    componentsTag.putString(key, value.getAsString());
-                } else if (value.getAsJsonPrimitive().isNumber()) {
-                    componentsTag.putInt(key, value.getAsInt()); // Assumes numbers are integers for now. Adjust if needed.
+                JsonPrimitive primitive = value.getAsJsonPrimitive();
+
+                if (primitive.isNumber()) {
+                    componentsTag.putInt(key, primitive.getAsInt());
+                } else if (primitive.isString()) {
+                    String strnum = primitive.getAsString().toLowerCase();
+                    if (strnum.endsWith("b")) {
+                        strnum = strnum.substring(0, strnum.length() - 1);
+                        if (strnum.startsWith("0b")) {
+                            componentsTag.putByte(key, Byte.parseByte(strnum.substring(2), 2));
+                        } else {
+                            componentsTag.putByte(key, Byte.parseByte(strnum));
+                        }
+                    } else if (strnum.endsWith("f")) {
+                        strnum = strnum.substring(0, strnum.length() - 1);
+                        componentsTag.putFloat(key, Float.parseFloat(strnum));
+                    } else if (strnum.endsWith("d")) {
+                        strnum = strnum.substring(0, strnum.length() - 1);
+                        componentsTag.putDouble(key, Double.parseDouble(strnum));
+                    } else {
+                        componentsTag.putString(key, primitive.getAsString());
+                    }
                 }
+
+
             } else if (value.isJsonObject()) {
                 componentsTag.put(key, deserializeComponents(value.getAsJsonObject()));
             } else if (key.equals("minecraft:enchantments") && value.isJsonObject()) {  // Handle enchantments specifically
