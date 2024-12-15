@@ -60,27 +60,28 @@ public class DatabaseManagerActor extends AbstractActor {
             BorukvaInventoryBackup.LOGGER.info("DataBase file successfully initialized!");
         } catch (SQLException e) {
             BorukvaInventoryBackup.LOGGER.info("Faild connect to database");
-            throw new RuntimeException("Error initializing database", e);
+            throw new SQLExceptionWrapper(e);
         }
     }
 
     public void getInventoryHistory(BActorMessages.GetInventoryHistory msg) {
         CommandContext<ServerCommandSource> context = msg.context();
-            try {
-                ServerPlayerEntity player = context.getSource().getPlayer();
-                String playerName = StringArgumentType.getString(context, "player");
-                //System.out.println("playerName" + playerName);
+        try {
+            ServerPlayerEntity player = context.getSource().getPlayer();
+            String playerName = StringArgumentType.getString(context, "player");
+            //System.out.println("playerName" + playerName);
 
-                if (!borukvaInventoryBackupDB.playerLoginTableExist(playerName)) {
-                    context.getSource().sendMessage(Text.literal("Такого гравця не існує"));
-                    return;
-                }
-
-                SimpleGui tableListGui = new TableListGui(player, playerName);
-                tableListGui.open();
-            } catch (SQLException e){
-                BorukvaInventoryBackup.LOGGER.warn(e.getMessage());
+            if (!borukvaInventoryBackupDB.playerLoginTableExist(playerName)) {
+                context.getSource().sendMessage(Text.literal("Такого гравця не існує"));
+                return;
             }
+
+            SimpleGui tableListGui = new TableListGui(player, playerName);
+            tableListGui.open();
+        } catch (SQLException e){
+            BorukvaInventoryBackup.LOGGER.warn(e.getMessage());
+            throw new SQLExceptionWrapper(e);
+        }
     }
 
     private void onPlayerDeath(BActorMessages.SavePlayerDataOnPlayerDeath msg) {
@@ -113,7 +114,7 @@ public class DatabaseManagerActor extends AbstractActor {
         try {
             borukvaInventoryBackupDB.addDataDeath(name, world, place, formattedDeathTime, deathReason, inventr, armorString, offHandString,xp);
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new SQLExceptionWrapper(e);
         }
 
     }
@@ -147,7 +148,7 @@ public class DatabaseManagerActor extends AbstractActor {
         try {
             borukvaInventoryBackupDB.addDataLogin(name, world, place, formattedLoginTime, inventr, armorString, offHandString,xp);
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new SQLExceptionWrapper(e);
         }
     }
 
@@ -179,7 +180,7 @@ public class DatabaseManagerActor extends AbstractActor {
         try {
             borukvaInventoryBackupDB.addDataLogout(name, world, place, formattedLoginTime, inventr, armorString, offHandString,xp);
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new SQLExceptionWrapper(e);
         }
     }
 
@@ -197,6 +198,7 @@ public class DatabaseManagerActor extends AbstractActor {
             }
         } catch (SQLException e){
             BorukvaInventoryBackup.LOGGER.info(e.getMessage());
+            throw new SQLExceptionWrapper(e);
         }
 
     }
@@ -210,6 +212,7 @@ public class DatabaseManagerActor extends AbstractActor {
             new LogoutHistoryGui(player, 0, logoutTableList).open();
         } catch (SQLException e){
             BorukvaInventoryBackup.LOGGER.info(e.getMessage());
+            throw new SQLExceptionWrapper(e);
         }
 
     }
@@ -224,6 +227,7 @@ public class DatabaseManagerActor extends AbstractActor {
             new LoginHistoryGui(player, 0, loginTableList).open();
         } catch (SQLException e){
             BorukvaInventoryBackup.LOGGER.info(e.getMessage());
+            throw new SQLExceptionWrapper(e);
         }
 
     }

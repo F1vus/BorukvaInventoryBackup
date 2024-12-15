@@ -29,10 +29,10 @@ public class LoginTable implements Table{
     @DatabaseField(dataType = DataType.STRING, width = 100000)
     private String inventory;
 
-    @DatabaseField(dataType = DataType.STRING)
+    @DatabaseField(dataType = DataType.STRING, width = 10000)
     private String armor;
 
-    @DatabaseField(dataType = DataType.STRING)
+    @DatabaseField(dataType = DataType.STRING, width = 10000)
     private String offHand;
 
     @DatabaseField(dataType = DataType.INTEGER)

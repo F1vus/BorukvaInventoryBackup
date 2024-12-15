@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(PlayerManager.class)
 public class OnPlayerLoginMixin {
-    @Inject(method = "onPlayerConnect", at = @At("HEAD"))
+    @Inject(method = "onPlayerConnect", at = @At("TAIL"))
     private void onPlayerConnectMixin(ClientConnection connection, ServerPlayerEntity player,
                                     ConnectedClientData clientData, CallbackInfo ci){
         System.out.println("PlayerConnect: "+player.getInventory().main);
