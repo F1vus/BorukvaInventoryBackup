@@ -22,8 +22,7 @@ public class BorukvaInventoryBackupDB {
 
     public BorukvaInventoryBackupDB() throws SQLException {
         JdbcConnectionSource connectionSource = new JdbcConnectionSource("jdbc:h2:./"+BorukvaInventoryBackup.MOD_ID);
-        connectionSource.setUsername("myUser");
-        connectionSource.setPassword("myPassword");
+
         TableUtils.createTableIfNotExists(connectionSource, DeathTable.class);
         TableUtils.createTableIfNotExists(connectionSource, LoginTable.class);
         TableUtils.createTableIfNotExists(connectionSource, LogoutTable.class);
