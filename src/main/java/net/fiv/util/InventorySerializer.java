@@ -2,8 +2,7 @@ package net.fiv.util;
 
 import com.google.gson.*;
 import com.google.gson.internal.LazilyParsedNumber;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtList;
+import net.minecraft.nbt.*;
 
 public class InventorySerializer {
 
@@ -47,7 +46,7 @@ public class InventorySerializer {
 
     private static NbtCompound deserializeComponents(JsonObject componentsObject) {
         NbtCompound componentsTag = new NbtCompound();
-
+        System.out.println("Components"+componentsObject);
         for (String key : componentsObject.keySet()) {
             JsonElement value = componentsObject.get(key);
 
@@ -55,9 +54,12 @@ public class InventorySerializer {
                 JsonPrimitive primitive = value.getAsJsonPrimitive();
 
                 if (primitive.isNumber()) {
+                    System.out.println("Int: "+primitive.getAsInt());
                     componentsTag.putInt(key, primitive.getAsInt());
                 } else if (primitive.isString()) {
+
                     String strnum = primitive.getAsString().toLowerCase();
+                    System.out.println("Str: "+strnum);
                     if (strnum.endsWith("b")) {
                         strnum = strnum.substring(0, strnum.length() - 1);
                         if (strnum.startsWith("0b")) {
@@ -78,15 +80,84 @@ public class InventorySerializer {
 
 
             } else if (value.isJsonObject()) {
+                System.out.println("Object: "+value.getAsJsonObject());
                 componentsTag.put(key, deserializeComponents(value.getAsJsonObject()));
-            } else if (key.equals("minecraft:enchantments") && value.isJsonObject()) {  // Handle enchantments specifically
+            } else if (key.equals("minecraft:enchantments") && value.isJsonObject()) {
+                System.out.println("ObjectJson: "+value.getAsJsonObject());
                 JsonObject enchantmentsObject = value.getAsJsonObject();
                 if (enchantmentsObject.has("levels") && enchantmentsObject.get("levels").isJsonObject()) {
                     componentsTag.put(key, deserializeComponents(enchantmentsObject.getAsJsonObject("levels")));
                 }
+            } else if(value.isJsonArray()){
+                JsonArray jsonArray = value.getAsJsonArray();
+                System.out.println("Ar: "+jsonArray.get(0).getAsString());
+                if(jsonArray.get(0).getAsString().equals("I")){
+                    jsonArray.remove(0);
+                    int[] x = new int[jsonArray.size()];
+                    int indx = 0;
+                    for(JsonElement num: jsonArray){
+                        x[indx] = num.getAsInt();
+                        System.out.println("I: "+x[indx]);
+                        indx++;
+                    }
+
+                    componentsTag.putIntArray(key, x);
+                } else if(jsonArray.get(0).getAsString().equals("B")){
+                    jsonArray.remove(0);
+                    byte[] x = new byte[jsonArray.size()];
+                    int indx = 0;
+                    for(JsonElement num: jsonArray){
+                        x[indx] = num.getAsByte();
+                        System.out.println("B: "+x[indx]);
+                        indx++;
+                    }
+
+                    componentsTag.putByteArray(key, x);
+                } else if(jsonArray.get(0).getAsString().equals("L")){
+                    jsonArray.remove(0);
+                    long[] x = new long[jsonArray.size()];
+                    int indx = 0;
+                    for(JsonElement num: jsonArray){
+                        x[indx] = num.getAsLong();
+                        System.out.println("L: "+x[indx]);
+                        indx++;
+                    }
+
+                    componentsTag.putLongArray(key, x);
+                } else {
+                    String strnum = jsonArray.get(0).getAsString();
+                    NbtList nbtList = new NbtList();
+
+                    System.out.println("Str: "+strnum);
+                    if (strnum.endsWith("d")) {
+                        int indx = 0;
+                        for(JsonElement elem: jsonArray){
+                            String el = elem.getAsString();
+                            el = el.substring(0, el.length() - 1);
+                            nbtList.addElement(indx,NbtDouble.of(Double.parseDouble(el)));
+                            indx++;
+                        }
+
+                    } else if (strnum.contains("f")) {
+                        int indx = 0;
+                        for(JsonElement elem: jsonArray){
+                            String el = elem.getAsString();
+                            el = el.substring(0, el.length() - 1);
+                            nbtList.addElement(indx,NbtFloat.of(Float.parseFloat(el)));
+                            indx++;
+                        }
+                    } else {
+                        int indx = 0;
+                        for(JsonElement elem: jsonArray){
+                            nbtList.addElement(indx, NbtString.of(elem.getAsString()));
+                            indx++;
+                        }
+                     }
+                    componentsTag.put(key, nbtList);
+                }
             }
         }
-
+        System.out.println("Return: "+componentsTag);
         return componentsTag;
     }
 
