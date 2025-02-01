@@ -177,7 +177,6 @@ InventoryGui extends SimpleGui {
 
         for(ItemStack itemStack: inventory){
             NbtCompound nbt = getItemStackNbt(itemStack, player.getRegistryManager().getOps(NbtOps.INSTANCE));
-
             playerItems.add(nbt.toString());
         }
 
