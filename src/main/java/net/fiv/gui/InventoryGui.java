@@ -37,7 +37,7 @@ InventoryGui extends SimpleGui {
     private void addItems(Map<Integer, ItemStack> itemStackMap, int xp, String playerName, SimpleGui caller){
         int i = 0;
         for(ItemStack item: itemStackMap.values()){
-            this.setSlot(i, new GuiElementBuilder(item.getItem())
+            this.setSlot(i, new GuiElementBuilder(item)
                     .setCount(item.getCount())
                     .build());
             i++;

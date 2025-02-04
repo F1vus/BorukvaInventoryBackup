@@ -35,8 +35,8 @@ public class LoginHistoryGui extends SimpleGui {
 
     private void addButtons(){
         int firstIndex = this.page * 45;
-
-        int lastIndex = Math.min(firstIndex + 45, this.loginTableList.size());
+        int tableSize = this.loginTableList.size();
+        int lastIndex = Math.min(firstIndex + 45, tableSize);
 
         for(int i=firstIndex; i<lastIndex; i++){
 
@@ -44,15 +44,15 @@ public class LoginHistoryGui extends SimpleGui {
 
             if(inventory_index>44) break;
 
-            String inventory = this.loginTableList.get(firstIndex+inventory_index).getInventory();
-            String armor = this.loginTableList.get(firstIndex+inventory_index).getArmor();
-            String offHand = this.loginTableList.get(firstIndex+inventory_index).getOffHand();
-            int xp = this.loginTableList.get(firstIndex+inventory_index).getXp();
+            String inventory = this.loginTableList.get(tableSize-i-1).getInventory();
+            String armor = this.loginTableList.get(tableSize-i-1).getArmor();
+            String offHand = this.loginTableList.get(tableSize-i-1).getOffHand();
+            int xp = this.loginTableList.get(tableSize-i-1).getXp();
             this.setSlot(inventory_index, new GuiElementBuilder(Items.CHEST)
-                    .setName(Text.literal("Time: "+this.loginTableList.get(firstIndex+inventory_index).getDate()))
-                    .addLoreLine(Text.literal("World: "+this.loginTableList.get(firstIndex+inventory_index).getWorld()))
-                    .addLoreLine(Text.literal("Place: "+this.loginTableList.get(firstIndex+inventory_index).getPlace()))
-                    .addLoreLine(Text.literal("XpLevel: "+this.loginTableList.get(firstIndex+inventory_index).getXp()))
+                    .setName(Text.literal("Time: "+this.loginTableList.get(tableSize-i-1).getDate()))
+                    .addLoreLine(Text.literal("World: "+this.loginTableList.get(tableSize-i-1).getWorld()))
+                    .addLoreLine(Text.literal("Place: "+this.loginTableList.get(tableSize-i-1).getPlace()))
+                    .addLoreLine(Text.literal("XpLevel: "+this.loginTableList.get(tableSize-i-1).getXp()))
                     .setCallback((index, type, action) -> {
                         Map<Integer, ItemStack> itemStackList = TableListGui.inventorySerialization(inventory, armor, offHand, player);
                         new InventoryGui(player, this.loginTableList.getFirst().getName(), itemStackList, xp, this).open();
