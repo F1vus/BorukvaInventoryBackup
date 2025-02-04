@@ -33,35 +33,40 @@ public class LogoutHistoryGui extends SimpleGui {
     }
 
 
-    public void addButtons(){
+    private void addButtons(){
         int firstIndex = this.page * 45;
+
         int lastIndex = Math.min(firstIndex + 45, this.logoutTableList.size());
 
-        for(int i=0; i<logoutTableList.size(); i++){
+        for(int i=firstIndex; i<lastIndex; i++){
+
             int inventory_index = i-firstIndex;
 
-            String inventory = logoutTableList.get(inventory_index).getInventory();
-            String armor = logoutTableList.get(inventory_index).getArmor();
-            String offHand = logoutTableList.get(inventory_index).getOffHand();
-            int xp = logoutTableList.get(inventory_index).getXp();
+            if(inventory_index>44) break;
+
+            String inventory = this.logoutTableList.get(firstIndex+inventory_index).getInventory();
+            String armor = this.logoutTableList.get(firstIndex+inventory_index).getArmor();
+            String offHand = this.logoutTableList.get(firstIndex+inventory_index).getOffHand();
+            int xp = this.logoutTableList.get(firstIndex+inventory_index).getXp();
             this.setSlot(inventory_index, new GuiElementBuilder(Items.CHEST)
-                    .setName(Text.literal("Time: "+logoutTableList.get(inventory_index).getDate()))
-                    .addLoreLine(Text.literal("World: "+logoutTableList.get(inventory_index).getWorld()))
-                    .addLoreLine(Text.literal("Place: "+logoutTableList.get(inventory_index).getPlace()))
-                    .addLoreLine(Text.literal("XpLevel: "+logoutTableList.get(inventory_index).getXp()))
+                    .setName(Text.literal("Time: "+this.logoutTableList.get(firstIndex+inventory_index).getDate()))
+                    .addLoreLine(Text.literal("World: "+this.logoutTableList.get(firstIndex+inventory_index).getWorld()))
+                    .addLoreLine(Text.literal("Place: "+this.logoutTableList.get(firstIndex+inventory_index).getPlace()))
+                    .addLoreLine(Text.literal("XpLevel: "+this.logoutTableList.get(firstIndex+inventory_index).getXp()))
                     .setCallback((index, type, action) -> {
                         Map<Integer, ItemStack> itemStackList = TableListGui.inventorySerialization(inventory, armor, offHand, player);
-                        new InventoryGui(player, logoutTableList.getFirst().getName(), itemStackList, xp, this).open();
+                        new InventoryGui(player, this.logoutTableList.getFirst().getName(), itemStackList, xp, this).open();
                     })
                     .build());
-            if(inventory_index>45) break;
+
+
         }
 
         if (lastIndex < this.logoutTableList.size()) {
             this.setSlot(53, new GuiElementBuilder(Items.ARROW)
                     .setName(Text.literal("Next Page"))
                     .setCallback((index, type, action) -> {
-                        new LogoutHistoryGui(player, page + 1, this.logoutTableList).open();
+                        new LogoutHistoryGui(player, page+1, this.logoutTableList).open();
                     })
                     .build());
         }
@@ -77,7 +82,7 @@ public class LogoutHistoryGui extends SimpleGui {
             this.setSlot(45, new GuiElementBuilder(Items.ARROW)
                     .setName(Text.literal("Previous Page"))
                     .setCallback((index, type, action) -> {
-                        new LogoutHistoryGui(player, page - 1, this.logoutTableList).open();
+                        new LogoutHistoryGui(player, page-1, this.logoutTableList).open();
                     })
                     .build());
         }

@@ -42,25 +42,27 @@ public class DeathHistoryGui extends SimpleGui {
         for(int i=firstIndex; i<lastIndex; i++){
             int inventory_index = i-firstIndex;
 
-            String inventory = this.deathTableList.get(inventory_index).getInventory();
-            String armor = this.deathTableList.get(inventory_index).getArmor();
-            String offHand = this.deathTableList.get(inventory_index).getOffHand();
-            int xp = this.deathTableList.get(inventory_index).getXp();
+            if(inventory_index>44) break;
+
+            String inventory = this.deathTableList.get(firstIndex+inventory_index).getInventory();
+            String armor = this.deathTableList.get(firstIndex+inventory_index).getArmor();
+            String offHand = this.deathTableList.get(firstIndex+inventory_index).getOffHand();
+            int xp = this.deathTableList.get(firstIndex+inventory_index).getXp();
             this.setSlot(inventory_index, new GuiElementBuilder(Items.CHEST)
-                    .setName(Text.literal("Time: "+this.deathTableList.get(inventory_index).getDate()))
-                    .addLoreLine(Text.literal("Death reason: "+this.deathTableList.get(inventory_index).getReason()))
-                    .addLoreLine(Text.literal("World: "+this.deathTableList.get(inventory_index).getWorld()))
-                    .addLoreLine(Text.literal("Place: "+this.deathTableList.get(inventory_index).getPlace()))
-                    .addLoreLine(Text.literal("XpLevel: "+this.deathTableList.get(inventory_index).getXp()))
+                    .setName(Text.literal("Time: "+this.deathTableList.get(firstIndex+inventory_index).getDate()))
+                    .addLoreLine(Text.literal("Death reason: "+this.deathTableList.get(firstIndex+inventory_index).getReason()))
+                    .addLoreLine(Text.literal("World: "+this.deathTableList.get(firstIndex+inventory_index).getWorld()))
+                    .addLoreLine(Text.literal("Place: "+this.deathTableList.get(firstIndex+inventory_index).getPlace()))
+                    .addLoreLine(Text.literal("XpLevel: "+this.deathTableList.get(firstIndex+inventory_index).getXp()))
                     .setCallback((index, type, action) -> {
                         Map<Integer, ItemStack> itemStackList = TableListGui.inventorySerialization(inventory, armor, offHand, player);
                         new InventoryGui(player, this.deathTableList.getFirst().getName(), itemStackList, xp, this).open();
                     })
                     .build());
-            if(inventory_index>45) break;
+
         }
 
-        if (lastIndex < deathTableList.size()) {
+        if (lastIndex < this.deathTableList.size()) {
             this.setSlot(53, new GuiElementBuilder(Items.ARROW)
                     .setName(Text.literal("Next Page"))
                     .setCallback((index, type, action) -> {
