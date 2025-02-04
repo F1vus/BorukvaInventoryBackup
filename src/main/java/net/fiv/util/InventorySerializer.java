@@ -23,7 +23,7 @@ public class InventorySerializer {
 
             return validateComponents(inventoryTag);
         } catch (CommandSyntaxException e){
-            System.out.println(e);
+            System.out.println("[CRITICAL ERROR]: "+e);
         }
 
         //System.out.println("SeriInvTag: "+inventoryTag);
@@ -32,7 +32,7 @@ public class InventorySerializer {
 
     private static NbtCompound validateComponents(NbtCompound compound){
         NbtList oldList = compound.getList("Inventory", 10);
-        System.out.println("CompudBEF "+compound);
+        //System.out.println("CompudBEF "+compound);
         for(int i=0; i<oldList.size(); i++){
             NbtCompound elem = (NbtCompound)oldList.get(i);
             if(elem.contains("count") && elem.contains("id")){
@@ -47,7 +47,7 @@ public class InventorySerializer {
         }
         compound.remove("Inventory");
         compound.put("Inventory", oldList);
-        System.out.println("CompoudAFT "+compound);
+        //System.out.println("CompoudAFT "+compound);
         return compound;
     }
 

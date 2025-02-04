@@ -64,7 +64,7 @@ public class TableListGui extends SimpleGui {
         NbtCompound nbtCompoundArmor = InventorySerializer.deserializeInventory(armor);
        // System.out.println("armor: "+armor);
         NbtList nbtListArmor = nbtCompoundArmor.getList("Inventory", 10);
-        System.out.println("NbtArmor "+ nbtListArmor.toString());
+       //  System.out.println("NbtArmor "+ nbtListArmor.toString());
 
         int index = 0;
         for(NbtElement nbtElement: nbtListArmor){
