@@ -17,7 +17,7 @@ public class OnPlayerLoginMixin {
     @Inject(method = "onPlayerConnect", at = @At("TAIL"))
     private void onPlayerConnectMixin(ClientConnection connection, ServerPlayerEntity player,
                                     ConnectedClientData clientData, CallbackInfo ci){
-        System.out.println("PlayerConnect: "+player.getInventory().main);
+        //System.out.println("PlayerConnect: "+player.getInventory().main);
         BorukvaInventoryBackup.getDatabaseManagerActor().tell(
                 new BActorMessages.SavePlayerDataOnPlayerConnect(player), ActorRef.noSender());
     }

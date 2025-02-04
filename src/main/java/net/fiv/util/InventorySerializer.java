@@ -1,6 +1,5 @@
 package net.fiv.util;
 
-import com.google.gson.*;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.nbt.*;
 
@@ -43,6 +42,7 @@ public class InventorySerializer {
             if(elem.getCompound("components").isEmpty()){
                 elem.remove("components");
             }
+
             oldList.set(i, elem);
         }
         compound.remove("Inventory");

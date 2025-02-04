@@ -37,7 +37,7 @@ InventoryGui extends SimpleGui {
     private void addItems(Map<Integer, ItemStack> itemStackMap, int xp, String playerName, SimpleGui caller){
         int i = 0;
         for(ItemStack item: itemStackMap.values()){
-            this.setSlot(i, new GuiElementBuilder(item)
+            this.setSlot(i, new GuiElementBuilder(item.getItem())
                     .setCount(item.getCount())
                     .build());
             i++;
@@ -96,12 +96,13 @@ InventoryGui extends SimpleGui {
         playerInventory.clear();
         //System.out.println("Back: "+itemStackMap);
         for(ItemStack itemStack: itemStackMap.values()){
+            //System.out.println("Size"+playerInventory.size());
             if(index < 4){
-                playerInventory.insertStack(36+index, itemStack);
+                playerInventory.setStack(36+index, itemStack);
             } else if (index==4) {
-                playerInventory.insertStack(40, itemStack);
+                playerInventory.setStack(40, itemStack);
             } else {
-                playerInventory.insertStack(index-5, itemStack);
+                playerInventory.setStack(index-5, itemStack);
             }
             //System.out.println("index: "+index);
             index++;
