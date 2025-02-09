@@ -144,4 +144,36 @@ public class TableListGui extends SimpleGui {
         return itemsToGive;
     }
 
+    protected static Map<Integer, ItemStack> inventorySerialization(String enderChest, ServerPlayerEntity player) {
+        World world = player.getWorld();
+
+        Map<Integer, ItemStack> itemsToGive = new HashMap<>();
+
+        NbtCompound nbtCompoundArmor = InventorySerializer.deserializeInventory(enderChest);
+        //System.out.println("armor: "+armor);
+        NbtList nbtListArmor = nbtCompoundArmor.getList("Inventory", 10);
+        //System.out.println("NbtArmor "+ nbtListArmor.toString());
+
+        int index = 0;
+        for (NbtElement nbtElement : nbtListArmor) {
+            NbtCompound itemNbt = (NbtCompound) nbtElement;
+
+            //System.out.println("SlotByte: "+itemNbt.getByte("Slot"));
+            ItemStack itemStack;
+            //System.out.println("BLOCKTAG: "+itemNbt.getString("id")); //
+            if (itemNbt.contains("components")) {
+
+                itemStack = ItemStack.fromNbt(world.getRegistryManager(), nbtElement).get();
+
+            } else if (Registries.ITEM.get(Identifier.of(itemNbt.getString("id"))).equals(Items.AIR)) {
+                itemStack = new ItemStack(Items.AIR);
+            } else {
+                itemStack = new ItemStack(Registries.ITEM.get(Identifier.of(itemNbt.getString("id"))), itemNbt.getInt("Count"));
+            }
+
+            itemsToGive.put(index, itemStack);
+            index++;
+        }
+        return itemsToGive;
+    }
 }

@@ -34,31 +34,31 @@ public class BorukvaInventoryBackupDB {
     }
 
     public void addDataDeath(String name, String world, String place,
-                                   String date, String reason, String inventory, String armor, String offHand,int xp) throws SQLException {
+                                   String date, String reason, String inventory, String armor, String offHand, String enderChest, int xp) throws SQLException {
 
         deleteOldestRecord(name, deathTableDao);
 
-        DeathTable deathTable = new DeathTable(name, world, place, date, reason, inventory, armor, offHand, xp);
+        DeathTable deathTable = new DeathTable(name, world, place, date, reason, inventory, armor, offHand, enderChest,xp);
 
         deathTableDao.create(deathTable);
     }
 
     public void addDataLogin(String name, String world, String place,
-                             String date, String inventory, String armor, String offHand, int xp) throws SQLException{
+                             String date, String inventory, String armor, String offHand, String enderChest,int xp) throws SQLException{
 
         deleteOldestRecord(name, loginTableDao);
 
-        LoginTable loginTable = new LoginTable(name , world, place, date, inventory, armor, offHand, xp);
+        LoginTable loginTable = new LoginTable(name , world, place, date, inventory, armor, offHand, enderChest,xp);
 
         loginTableDao.create(loginTable);
     }
 
     public void addDataLogout(String name, String world, String place,
-                             String date, String inventory, String armor, String offHand, int xp) throws SQLException{
+                             String date, String inventory, String armor, String offHand, String enderChest,int xp) throws SQLException{
 
         deleteOldestRecord(name, logoutTableDao);
 
-        LogoutTable logoutTable = new LogoutTable(name, world, place, date, inventory, armor, offHand, xp);
+        LogoutTable logoutTable = new LogoutTable(name, world, place, date, inventory, armor, offHand, enderChest,xp);
 
         logoutTableDao.create(logoutTable);
     }

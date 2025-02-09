@@ -12,18 +12,10 @@ import net.fiv.data_base.entities.DeathTable;
 import net.fiv.data_base.entities.LoginTable;
 import net.fiv.data_base.entities.LogoutTable;
 import net.fiv.gui.*;
-import net.minecraft.command.argument.packrat.NbtParsingRule;
-import net.minecraft.data.dev.NbtProvider;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtHelper;
-import net.minecraft.nbt.NbtIo;
-import net.minecraft.nbt.scanner.NbtCollector;
-import net.minecraft.nbt.scanner.NbtTreeNode;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.NbtTextContent;
 import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
 
@@ -98,6 +90,7 @@ public class DatabaseManagerActor extends AbstractActor {
 
         DefaultedList<ItemStack> inventory = player.getInventory().main;
         DefaultedList<ItemStack> armor = player.getInventory().armor;
+        DefaultedList<ItemStack> enderChest = player.getEnderChestInventory().heldStacks;
         List<ItemStack> offHand = new ArrayList<>();
         offHand.add(player.getOffHandStack());
 
@@ -117,10 +110,12 @@ public class DatabaseManagerActor extends AbstractActor {
         String inventr = InventoryGui.playerItems(inventory, player).toString();
         String armorString = InventoryGui.playerItems(armor, player).toString();
         String offHandString = InventoryGui.playerItems(offHand, player).toString();
+        String enderChestString =  InventoryGui.playerItems(enderChest, player).toString();
+        System.out.println("DeathEnder: "+enderChestString);
 
         int xp = player.experienceLevel;
         try {
-            borukvaInventoryBackupDB.addDataDeath(name, world, place, formattedDeathTime, deathReason, inventr, armorString, offHandString,xp);
+            borukvaInventoryBackupDB.addDataDeath(name, world, place, formattedDeathTime, deathReason, inventr, armorString, offHandString, enderChestString, xp);
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
         }
@@ -133,6 +128,7 @@ public class DatabaseManagerActor extends AbstractActor {
         DefaultedList<ItemStack> inventory = player.getInventory().main;
         //System.out.println("DefaultedList: "+inventory);
         DefaultedList<ItemStack> armor = player.getInventory().armor;
+        DefaultedList<ItemStack> enderChest = player.getEnderChestInventory().heldStacks;
         List<ItemStack> offHand = new ArrayList<>();
         offHand.add(player.getOffHandStack());
 
@@ -150,11 +146,13 @@ public class DatabaseManagerActor extends AbstractActor {
         String inventr = InventoryGui.playerItems(inventory, player).toString();
         String armorString = InventoryGui.playerItems(armor, player).toString();
         String offHandString = InventoryGui.playerItems(offHand, player).toString();
+        String enderChestString =  InventoryGui.playerItems(enderChest, player).toString();
         //System.out.println("Inventr:"+inventr);
+
         int xp = player.experienceLevel;
 
         try {
-            borukvaInventoryBackupDB.addDataLogin(name, world, place, formattedLoginTime, inventr, armorString, offHandString,xp);
+            borukvaInventoryBackupDB.addDataLogin(name, world, place, formattedLoginTime, inventr, armorString, offHandString,enderChestString,xp);
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
         }
@@ -165,6 +163,7 @@ public class DatabaseManagerActor extends AbstractActor {
 
         DefaultedList<ItemStack> inventory = player.getInventory().main;
         DefaultedList<ItemStack> armor = player.getInventory().armor;
+        DefaultedList<ItemStack> enderChest = player.getEnderChestInventory().heldStacks;
         List<ItemStack> offHand = new ArrayList<>();
         offHand.add(player.getOffHandStack());
 
@@ -182,11 +181,12 @@ public class DatabaseManagerActor extends AbstractActor {
         String inventr = InventoryGui.playerItems(inventory, player).toString();
         String armorString = InventoryGui.playerItems(armor, player).toString();
         String offHandString = InventoryGui.playerItems(offHand, player).toString();
+        String enderChestString =  InventoryGui.playerItems(enderChest, player).toString();
 
         int xp = player.experienceLevel;
 
         try {
-            borukvaInventoryBackupDB.addDataLogout(name, world, place, formattedLoginTime, inventr, armorString, offHandString,xp);
+            borukvaInventoryBackupDB.addDataLogout(name, world, place, formattedLoginTime, inventr, armorString, offHandString, enderChestString,xp);
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
         }

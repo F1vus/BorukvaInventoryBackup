@@ -47,6 +47,7 @@ public class LogoutHistoryGui extends SimpleGui {
             String inventory = this.logoutTableList.get(tableSize-i-1).getInventory();
             String armor = this.logoutTableList.get(tableSize-i-1).getArmor();
             String offHand = this.logoutTableList.get(tableSize-i-1).getOffHand();
+            String enderChest = this.logoutTableList.get(tableSize-i-1).getEnderChest();
             int xp = this.logoutTableList.get(tableSize-i-1).getXp();
             this.setSlot(inventory_index, new GuiElementBuilder(Items.CHEST)
                     .setName(Text.literal("Time: "+this.logoutTableList.get(tableSize-i-1).getDate()))
@@ -55,7 +56,8 @@ public class LogoutHistoryGui extends SimpleGui {
                     .addLoreLine(Text.literal("XpLevel: "+this.logoutTableList.get(tableSize-i-1).getXp()))
                     .setCallback((index, type, action) -> {
                         Map<Integer, ItemStack> itemStackList = TableListGui.inventorySerialization(inventory, armor, offHand, player);
-                        new InventoryGui(player, this.logoutTableList.getFirst().getName(), itemStackList, xp, this).open();
+                        Map<Integer, ItemStack> enderChestItemStackList = TableListGui.inventorySerialization(enderChest, player);
+                        new InventoryGui(player, this.logoutTableList.getFirst().getName(), itemStackList, enderChestItemStackList,xp, this).open();
                     })
                     .build());
 

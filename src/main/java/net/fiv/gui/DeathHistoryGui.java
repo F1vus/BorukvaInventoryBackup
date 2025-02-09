@@ -49,7 +49,9 @@ public class DeathHistoryGui extends SimpleGui {
             String inventory = this.deathTableList.get(tableSize-i-1).getInventory();
             String armor = this.deathTableList.get(tableSize-i-1).getArmor();
             String offHand = this.deathTableList.get(tableSize-i-1).getOffHand();
+            String enderChest = this.deathTableList.get(tableSize-i-1).getEnderChest();
             int xp = this.deathTableList.get(tableSize-i-1).getXp();
+
             this.setSlot(inventory_index, new GuiElementBuilder(Items.CHEST)
                     .setName(Text.literal("Time: "+this.deathTableList.get(tableSize-i-1).getDate()))
                     .addLoreLine(Text.literal("Death reason: "+this.deathTableList.get(tableSize-i-1).getReason()))
@@ -58,7 +60,8 @@ public class DeathHistoryGui extends SimpleGui {
                     .addLoreLine(Text.literal("XpLevel: "+this.deathTableList.get(tableSize-i-1).getXp()))
                     .setCallback((index, type, action) -> {
                         Map<Integer, ItemStack> itemStackList = TableListGui.inventorySerialization(inventory, armor, offHand, player);
-                        new InventoryGui(player, this.deathTableList.getFirst().getName(), itemStackList, xp, this).open();
+                        Map<Integer, ItemStack> enderChestItemStackList = TableListGui.inventorySerialization(enderChest, player);
+                        new InventoryGui(player, this.deathTableList.getFirst().getName(), itemStackList, enderChestItemStackList,xp, this).open();
                     })
                     .build());
 

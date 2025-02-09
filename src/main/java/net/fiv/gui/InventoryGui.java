@@ -27,14 +27,14 @@ import java.util.*;
 public class
 InventoryGui extends SimpleGui {
 
-    public InventoryGui(ServerPlayerEntity player, String playerName, Map<Integer, ItemStack> itemStackMap, int xp, SimpleGui caller) {
+    public InventoryGui(ServerPlayerEntity player, String playerName, Map<Integer, ItemStack> itemStackMap, Map<Integer, ItemStack> enderChestMap,int xp, SimpleGui caller) {
         super(ScreenHandlerType.GENERIC_9X6, player, false);
 
-        addItems(itemStackMap, xp, playerName, caller);
+        addItems(itemStackMap, enderChestMap,xp, playerName,caller);
     }
 
 
-    private void addItems(Map<Integer, ItemStack> itemStackMap, int xp, String playerName, SimpleGui caller){
+    private void addItems(Map<Integer, ItemStack> itemStackMap, Map<Integer, ItemStack> enderChestMap,int xp, String playerName, SimpleGui caller){
         int i = 0;
         for(ItemStack item: itemStackMap.values()){
             this.setSlot(i, new GuiElementBuilder(item)
@@ -62,14 +62,27 @@ InventoryGui extends SimpleGui {
                 })
                 .build());
 
-        this.setSlot(52, new GuiElementBuilder(Items.PAPER)
+        this.setSlot(52, new GuiElementBuilder(Items.ENDER_CHEST)
+                .setName(Text.literal("Player ender chest").formatted(Formatting.DARK_PURPLE))
+                .setCallback((index, type, action) -> {
+                    new EnderChestGui(player, playerName,enderChestMap, this).open();
+                })
+                .build());
+
+        this.setSlot(51, new GuiElementBuilder(Items.EXPERIENCE_BOTTLE)
+                .setName(Text.literal("XP level: "+xp).formatted(Formatting.YELLOW))
+                .build());
+
+        this.setSlot(50, new GuiElementBuilder(Items.EMERALD)
                 .setName(Text.literal("Return back"))
-                .setItem(Items.EMERALD)
                 .setCallback((index, type, action) -> {
                     caller.open();
 
                 })
                 .build());
+
+
+
     }
 
     public static UUID getOfflinePlayerProfile(String playerName, MinecraftServer server) {
