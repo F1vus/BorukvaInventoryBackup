@@ -236,7 +236,6 @@ public class DatabaseManagerActor extends AbstractActor {
 
         try{
             List<LoginTable> loginTableList = borukvaInventoryBackupDB.getLoginData(playerName);
-            System.out.println("LoginTable: "+loginTableList);
 
             new LoginHistoryGui(player, 0, loginTableList).open();
         } catch (SQLException e){

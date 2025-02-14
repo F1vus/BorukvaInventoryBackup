@@ -1,6 +1,7 @@
 package net.fiv.util;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.fiv.BorukvaInventoryBackup;
 import net.minecraft.nbt.*;
 
 public class InventorySerializer {
@@ -22,7 +23,7 @@ public class InventorySerializer {
 
             return validateComponents(inventoryTag);
         } catch (CommandSyntaxException e){
-            System.out.println("[CRITICAL ERROR]: "+e);
+            BorukvaInventoryBackup.LOGGER.error(e.getMessage());
         }
 
         //System.out.println("SeriInvTag: "+inventoryTag);
