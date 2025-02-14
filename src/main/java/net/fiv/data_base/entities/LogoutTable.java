@@ -26,16 +26,16 @@ public class LogoutTable implements Table{
     @DatabaseField(dataType = DataType.STRING)
     private String date;
 
-    @DatabaseField(dataType = DataType.STRING, width = 100000)
+    @DatabaseField(dataType = DataType.STRING, width = 1000000)
     private String inventory;
 
-    @DatabaseField(dataType = DataType.STRING, width = 10000)
+    @DatabaseField(dataType = DataType.STRING, width = 100000)
     private String armor;
 
-    @DatabaseField(dataType = DataType.STRING, width = 10000)
+    @DatabaseField(dataType = DataType.STRING, width = 100000)
     private String offHand;
 
-    @DatabaseField(dataType = DataType.STRING, width = 10000)
+    @DatabaseField(dataType = DataType.STRING, width = 1000000)
     private String enderChest;
 
     @DatabaseField(dataType = DataType.INTEGER)
