@@ -111,7 +111,7 @@ public class DatabaseManagerActor extends AbstractActor {
         String armorString = InventoryGui.playerItems(armor, player).toString();
         String offHandString = InventoryGui.playerItems(offHand, player).toString();
         String enderChestString =  InventoryGui.playerItems(enderChest, player).toString();
-        System.out.println("DeathEnder: "+enderChestString);
+        //System.out.println("DeathEnder: "+enderChestString);
 
         int xp = player.experienceLevel;
         try {
