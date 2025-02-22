@@ -42,4 +42,9 @@ public class GetInventoryHistoryCommand {
                 new BActorMessages.GetLoginTableMap(player, playerName), ActorRef.noSender());
     }
 
+    public static void getPreRestoreTableMap(ServerPlayerEntity player, String playerName){
+        BorukvaInventoryBackup.getDatabaseManagerActor().tell(
+                new BActorMessages.GetPreRestoreTableMap(player, playerName), ActorRef.noSender());
+    }
+
 }

@@ -17,7 +17,8 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
-import java.util.*;
+import java.util.Map;
+import java.util.HashMap;
 
 public class TableListGui extends SimpleGui {
 
@@ -30,16 +31,16 @@ public class TableListGui extends SimpleGui {
     }
 
     private void addButtons(String playerName){
-        this.setSlot(3, new GuiElementBuilder(Items.CHEST)
-                .setName(Text.literal("Історія входів").formatted(Formatting.GREEN, Formatting.BOLD))
+        this.setSlot(2, new GuiElementBuilder(Items.CHEST)
+                .setName(Text.literal("Login history").formatted(Formatting.GREEN, Formatting.BOLD))
                 .setCallback((index, type, action) -> {
                     GetInventoryHistoryCommand.getLoginTableMap(player, playerName);
                 })
 
                 .build());
 
-        this.setSlot(4, new GuiElementBuilder(Items.CHEST)
-                .setName(Text.literal("Історія виходів").formatted(Formatting.YELLOW, Formatting.BOLD))
+        this.setSlot(3, new GuiElementBuilder(Items.CHEST)
+                .setName(Text.literal("Logout history").formatted(Formatting.YELLOW, Formatting.BOLD))
                 .setCallback((index, type, action) -> {
                     GetInventoryHistoryCommand.getLogoutTableMap(player, playerName);
                 })
@@ -47,9 +48,18 @@ public class TableListGui extends SimpleGui {
                 .build());
 
         this.setSlot(5, new GuiElementBuilder(Items.CHEST)
-                .setName(Text.literal("Історія смертей").formatted(Formatting.RED, Formatting.BOLD))
+                .setName(Text.literal("Death history").formatted(Formatting.RED, Formatting.BOLD))
                 .setCallback((index, type, action) -> {
                     GetInventoryHistoryCommand.getDeathTableMap(player, playerName);
+
+                })
+
+                .build());
+
+        this.setSlot(6, new GuiElementBuilder(Items.CHEST)
+                .setName(Text.literal("Backups history").formatted(Formatting.DARK_GRAY, Formatting.BOLD))
+                .setCallback((index, type, action) -> {
+                    GetInventoryHistoryCommand.getPreRestoreTableMap(player, playerName);
 
                 })
 

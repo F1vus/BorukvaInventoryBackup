@@ -1,11 +1,13 @@
 package net.fiv.gui;
 
+import akka.actor.ActorRef;
 import com.mojang.authlib.GameProfile;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.DynamicOps;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.fiv.BorukvaInventoryBackup;
+import net.fiv.actor.BActorMessages;
 import net.minecraft.component.ComponentChanges;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -24,8 +26,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.*;
 
-public class
-InventoryGui extends SimpleGui {
+public class InventoryGui extends SimpleGui {
 
     public InventoryGui(ServerPlayerEntity player, String playerName, Map<Integer, ItemStack> itemStackMap, Map<Integer, ItemStack> enderChestMap,int xp, SimpleGui caller) {
         super(ScreenHandlerType.GENERIC_9X6, player, false);
@@ -46,42 +47,51 @@ InventoryGui extends SimpleGui {
 
 
         this.setSlot(53, new GuiElementBuilder(Items.PAPER)
-                .setName(Text.literal("Backup player inventory"))
+                .setName(Text.literal("Backup player inventory(recovery will be irreversible)").formatted(Formatting.RED, Formatting.BOLD))
                 .setCallback((index, type, action) -> {
                     UUID uuid = getOfflinePlayerProfile(playerName, player.getServer());
 
                     if(this.player.getServer().getPlayerManager().getPlayer(playerName) != null){
                         backUpPlayerItems(itemStackMap, xp,this.player.getServer().getPlayerManager().getPlayer(playerName));
-                        this.getPlayer().sendMessage(Text.literal("Ви успішно відновили речі онлайн гравцю!").formatted(Formatting.GREEN, Formatting.BOLD));
+                        this.getPlayer().sendMessage(Text.literal("You have successfully restored items to an online player!").formatted(Formatting.GREEN, Formatting.BOLD));
                     } else {
-                        saveOfflinePlayerInventory(uuid, xp,itemStackMap);
-                        this.getPlayer().sendMessage(Text.literal("Ви успішно відновили речі оффлайн гравцю!").formatted(Formatting.GREEN, Formatting.BOLD));
+                        saveOfflinePlayerInventory(uuid, xp,itemStackMap, playerName);
+                        this.getPlayer().sendMessage(Text.literal("You have successfully restored items to an offline player!").formatted(Formatting.GREEN, Formatting.BOLD));
 
                     }
 
                 })
                 .build());
 
-        this.setSlot(52, new GuiElementBuilder(Items.ENDER_CHEST)
+        this.setSlot(47, new GuiElementBuilder(Items.ENDER_CHEST)
                 .setName(Text.literal("Player ender chest").formatted(Formatting.DARK_PURPLE))
                 .setCallback((index, type, action) -> {
                     new EnderChestGui(player, playerName,enderChestMap, this).open();
                 })
                 .build());
 
-        this.setSlot(51, new GuiElementBuilder(Items.EXPERIENCE_BOTTLE)
+        this.setSlot(46, new GuiElementBuilder(Items.EXPERIENCE_BOTTLE)
                 .setName(Text.literal("XP level: "+xp).formatted(Formatting.YELLOW))
                 .build());
 
-        this.setSlot(50, new GuiElementBuilder(Items.EMERALD)
+        this.setSlot(45, new GuiElementBuilder(Items.EMERALD)
                 .setName(Text.literal("Return back"))
                 .setCallback((index, type, action) -> {
                     caller.open();
 
                 })
                 .build());
+    }
 
+    private static void savePreRestorePlayerInventory(String playerName, String inventory, String armor, String offHand, String enderChest, int xp){
+        BorukvaInventoryBackup.getDatabaseManagerActor().tell(
+                new BActorMessages.SavePlayerDataOnPlayerRestore(playerName, inventory, armor, offHand, enderChest, xp), ActorRef.noSender());
 
+    }
+
+    private static void savePreRestorePlayerInventory(String playerName, NbtList inventory, NbtList enderChest, int xp){
+        BorukvaInventoryBackup.getDatabaseManagerActor().tell(
+                new BActorMessages.SavePlayerDataOnPlayerRestoreNbt(playerName, inventory, enderChest, xp), ActorRef.noSender());
 
     }
 
@@ -106,6 +116,15 @@ InventoryGui extends SimpleGui {
 
         int index = 0;
         PlayerInventory playerInventory = player.getInventory();
+
+        savePreRestorePlayerInventory(player.getName().getString(),
+                playerItems(playerInventory.main, player).toString(),
+                playerItems(playerInventory.armor, player).toString(),
+                playerItems(playerInventory.offHand, player).toString(),
+                playerItems(player.getEnderChestInventory().heldStacks, player).toString(),
+                xp
+                );
+
         playerInventory.clear();
         //System.out.println("Back: "+itemStackMap);
         for(ItemStack itemStack: itemStackMap.values()){
@@ -124,7 +143,7 @@ InventoryGui extends SimpleGui {
 
     }
 
-    private void saveOfflinePlayerInventory(UUID uuid, int xp, Map<Integer, ItemStack> itemStackMap) {
+    private void saveOfflinePlayerInventory(UUID uuid, int xp, Map<Integer, ItemStack> itemStackMap, String playerName) {
         File playerDataDir = this.player.getServer().getSavePath(WorldSavePath.PLAYERDATA).toFile();
 
 //        System.out.println(playerDataDir);
@@ -134,6 +153,10 @@ InventoryGui extends SimpleGui {
             NbtCompound nbtCompound = NbtIo.readCompressed(new FileInputStream(file2), NbtSizeTracker.ofUnlimitedBytes());
 
             NbtList inventoryList = nbtCompound.getList("Inventory", 10);
+            NbtList enderChestLists = nbtCompound.getList("EnderItems", 10);
+
+            savePreRestorePlayerInventory(playerName, inventoryList, enderChestLists, xp);
+
             inventoryList.clear();
 
             int index = 0;

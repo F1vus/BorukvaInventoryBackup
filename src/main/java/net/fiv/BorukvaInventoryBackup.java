@@ -7,7 +7,6 @@ import net.fabricmc.api.ModInitializer;
 
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fiv.actor.BActorMessages;
-import net.fiv.actor.DatabaseManagerActor;
 import net.fiv.actor.DatabaseManagerSupervisor;
 import net.fiv.commands.GetInventoryHistoryCommand;
 import net.fiv.config.ModConfigs;

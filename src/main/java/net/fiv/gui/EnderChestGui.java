@@ -37,23 +37,23 @@ public class EnderChestGui extends SimpleGui {
             i++;
         }
         this.setSlot(35, new GuiElementBuilder(Items.PAPER)
-                .setName(Text.literal("Backup player ender chest"))
+                .setName(Text.literal("Backup player ender chest(recovery will be irreversible)").formatted(Formatting.RED, Formatting.BOLD))
                 .setCallback((index, type, action) -> {
                     UUID uuid = InventoryGui.getOfflinePlayerProfile(playerName, player.getServer());
 
                     if(this.player.getServer().getPlayerManager().getPlayer(playerName) != null){
                         backUpPlayerItems(enderChestMap, this.player.getServer().getPlayerManager().getPlayer(playerName));
-                        this.getPlayer().sendMessage(Text.literal("Ви успішно відновили речі онлайн гравцю!").formatted(Formatting.GREEN, Formatting.BOLD));
+                        this.getPlayer().sendMessage(Text.literal("You have successfully restored items to an online player!").formatted(Formatting.GREEN, Formatting.BOLD));
                     } else {
                         saveOfflinePlayerEnderChest(uuid, enderChestMap);
-                        this.getPlayer().sendMessage(Text.literal("Ви успішно відновили речі оффлайн гравцю!").formatted(Formatting.GREEN, Formatting.BOLD));
+                        this.getPlayer().sendMessage(Text.literal("You have successfully restored items to an offline player!").formatted(Formatting.GREEN, Formatting.BOLD));
 
                     }
 
                 })
                 .build());
 
-        this.setSlot(34, new GuiElementBuilder(Items.EMERALD)
+        this.setSlot(27, new GuiElementBuilder(Items.EMERALD)
                 .setName(Text.literal("Return back"))
                 .setCallback((index, type, action) -> {
                     caller.open();

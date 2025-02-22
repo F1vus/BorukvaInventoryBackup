@@ -6,10 +6,7 @@ import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 import net.fiv.BorukvaInventoryBackup;
 import net.fiv.config.ModConfigs;
-import net.fiv.data_base.entities.DeathTable;
-import net.fiv.data_base.entities.LoginTable;
-import net.fiv.data_base.entities.LogoutTable;
-import net.fiv.data_base.entities.Table;
+import net.fiv.data_base.entities.*;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -19,18 +16,38 @@ public class BorukvaInventoryBackupDB {
     private final Dao<DeathTable, String> deathTableDao;
     private final Dao<LoginTable, String> loginTableDao;
     private final Dao<LogoutTable, String> logoutTableDao;
+    private final Dao<PreRestoreTable, String> preRestoreTableDao;
+    private final JdbcConnectionSource connectionSource;
 
     public BorukvaInventoryBackupDB() throws SQLException {
-        JdbcConnectionSource connectionSource = new JdbcConnectionSource("jdbc:h2:./"+BorukvaInventoryBackup.MOD_ID);
+        connectionSource = new JdbcConnectionSource("jdbc:h2:./"+BorukvaInventoryBackup.MOD_ID);
 
         TableUtils.createTableIfNotExists(connectionSource, DeathTable.class);
         TableUtils.createTableIfNotExists(connectionSource, LoginTable.class);
         TableUtils.createTableIfNotExists(connectionSource, LogoutTable.class);
+        TableUtils.createTableIfNotExists(connectionSource, PreRestoreTable.class);
 
         deathTableDao = DaoManager.createDao(connectionSource, DeathTable.class);
         loginTableDao = DaoManager.createDao(connectionSource, LoginTable.class);
         logoutTableDao = DaoManager.createDao(connectionSource, LogoutTable.class);
+        preRestoreTableDao = DaoManager.createDao(connectionSource, PreRestoreTable.class);
+
+        modifyTableForH2();
+
+    }
+
+    public BorukvaInventoryBackupDB(String url, String user, String password) throws SQLException {
+        connectionSource = new JdbcConnectionSource("jdbc:mysql://"+url, user, password);
+
+        TableUtils.createTableIfNotExists(connectionSource, DeathTable.class);
+        TableUtils.createTableIfNotExists(connectionSource, LoginTable.class);
+        TableUtils.createTableIfNotExists(connectionSource, LogoutTable.class);
+        TableUtils.createTableIfNotExists(connectionSource, PreRestoreTable.class);
         
+        deathTableDao = DaoManager.createDao(connectionSource, DeathTable.class);
+        loginTableDao = DaoManager.createDao(connectionSource, LoginTable.class);
+        logoutTableDao = DaoManager.createDao(connectionSource, LogoutTable.class);
+        preRestoreTableDao = DaoManager.createDao(connectionSource, PreRestoreTable.class);
     }
 
     public void addDataDeath(String name, String world, String place,
@@ -63,6 +80,14 @@ public class BorukvaInventoryBackupDB {
         logoutTableDao.create(logoutTable);
     }
 
+    public void addDataPreRestore(String name, String date, String inventory, String armor, String offHand, String enderChest, int xp) throws SQLException{
+        deleteOldestRecord(name, preRestoreTableDao);
+
+        PreRestoreTable preRestoreTable = new PreRestoreTable(name, date, inventory, armor, offHand, enderChest, xp);
+
+        preRestoreTableDao.create(preRestoreTable);
+    }
+
     public List<DeathTable> getDeathData(String playerName) throws SQLException{
         List<DeathTable> results = deathTableDao.queryForEq("name", playerName);
         if (results != null && !results.isEmpty()) {
@@ -81,6 +106,14 @@ public class BorukvaInventoryBackupDB {
 
     public List<LogoutTable> getLogoutData(String playerName) throws SQLException{
         List<LogoutTable> results = logoutTableDao.queryForEq("name", playerName);
+        if (results != null && !results.isEmpty()) {
+            return results;
+        }
+        return null;
+    }
+
+    public List<PreRestoreTable> getPreRestoreData(String playerName) throws SQLException{
+        List<PreRestoreTable> results = preRestoreTableDao.queryForEq("name", playerName);
         if (results != null && !results.isEmpty()) {
             return results;
         }
@@ -110,4 +143,50 @@ public class BorukvaInventoryBackupDB {
         return results != null && !results.isEmpty();
     }
 
+    private void modifyTableForH2() throws SQLException {
+
+        String[] alterStatementsDeath = {
+                "ALTER TABLE death_table ALTER COLUMN inventory VARCHAR(2000000);",  // 2 000 000
+                "ALTER TABLE death_table ALTER COLUMN armor VARCHAR(1000000);",  // 1 000 000
+                "ALTER TABLE death_table ALTER COLUMN offHand VARCHAR(300000);", // 300 000
+                "ALTER TABLE death_table ALTER COLUMN enderChest VARCHAR(2000000);" // 2 000 000
+        };
+        String[] alterStatementsLogin = {
+                "ALTER TABLE login_table ALTER COLUMN inventory VARCHAR(2000000);", // 2 000 000
+                "ALTER TABLE login_table ALTER COLUMN armor VARCHAR(1000000);", // 1 000 000
+                "ALTER TABLE login_table ALTER COLUMN offHand VARCHAR(300000);", // 300 000
+                "ALTER TABLE login_table ALTER COLUMN enderChest VARCHAR(2000000);", // 2 000 000
+        };
+        String[] alterStatementsLogout = {
+                "ALTER TABLE logout_table ALTER COLUMN inventory VARCHAR(2000000);", // 2 000 000
+                "ALTER TABLE logout_table ALTER COLUMN armor VARCHAR(1000000);", // 1 000 000
+                "ALTER TABLE logout_table ALTER COLUMN offHand VARCHAR(300000);", // 300 000
+                "ALTER TABLE logout_table ALTER COLUMN enderChest VARCHAR(2000000);", // 2 000 000
+
+        };
+
+        String[] alterStatementsPreRestore = {
+                "ALTER TABLE pre_restore_table ALTER COLUMN inventory VARCHAR(2000000);", // 2 000 000
+                "ALTER TABLE pre_restore_table ALTER COLUMN armor VARCHAR(1000000);", // 1 000 000
+                "ALTER TABLE pre_restore_table ALTER COLUMN offHand VARCHAR(300000);", // 300 000
+                "ALTER TABLE pre_restore_table ALTER COLUMN enderChest VARCHAR(2000000);", // 2 000 000
+
+        };
+
+        for(String sql: alterStatementsDeath) {
+            deathTableDao.executeRawNoArgs(sql);
+        }
+        for(String sql: alterStatementsLogin) {
+            loginTableDao.executeRawNoArgs(sql);
+        }
+        for(String sql: alterStatementsLogout) {
+            logoutTableDao.executeRawNoArgs(sql);
+        }
+        for(String sql: alterStatementsPreRestore){
+            preRestoreTableDao.executeRawNoArgs(sql);
+        }
+    }
+    public void closeDbConnection() throws Exception {
+        connectionSource.close();
+    }
 }
