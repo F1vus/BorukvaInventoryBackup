@@ -18,6 +18,8 @@ import java.io.FileInputStream;
 import java.util.Map;
 import java.util.UUID;
 
+import static net.fiv.gui.InventoryGui.playerItems;
+
 public class EnderChestGui extends SimpleGui {
 
 
@@ -45,7 +47,7 @@ public class EnderChestGui extends SimpleGui {
                         backUpPlayerItems(enderChestMap, this.player.getServer().getPlayerManager().getPlayer(playerName));
                         this.getPlayer().sendMessage(Text.literal("You have successfully restored items to an online player!").formatted(Formatting.GREEN, Formatting.BOLD));
                     } else {
-                        saveOfflinePlayerEnderChest(uuid, enderChestMap);
+                        saveOfflinePlayerEnderChest(uuid, enderChestMap, playerName);
                         this.getPlayer().sendMessage(Text.literal("You have successfully restored items to an offline player!").formatted(Formatting.GREEN, Formatting.BOLD));
 
                     }
@@ -65,6 +67,16 @@ public class EnderChestGui extends SimpleGui {
     private void backUpPlayerItems(Map<Integer, ItemStack> itemStackMap, ServerPlayerEntity player){
         int index = 0;
         EnderChestInventory enderChestInventory = player.getEnderChestInventory();
+
+        InventoryGui.savePreRestorePlayerInventory(player.getName().getString(),
+                playerItems(player.getEnderChestInventory().heldStacks, player).toString(),
+                null,
+                null,
+                null,
+                false,
+                0
+        );
+
         enderChestInventory.clear();
         //System.out.println("Back: "+itemStackMap);
         for(ItemStack itemStack: itemStackMap.values()){
@@ -75,7 +87,7 @@ public class EnderChestGui extends SimpleGui {
         }
     }
 
-    private void saveOfflinePlayerEnderChest(UUID uuid, Map<Integer, ItemStack> itemStackMap) {
+    private void saveOfflinePlayerEnderChest(UUID uuid, Map<Integer, ItemStack> itemStackMap, String playerName) {
         File playerDataDir = this.player.getServer().getSavePath(WorldSavePath.PLAYERDATA).toFile();
 
 //        System.out.println(playerDataDir);
@@ -85,6 +97,17 @@ public class EnderChestGui extends SimpleGui {
             NbtCompound nbtCompound = NbtIo.readCompressed(new FileInputStream(file2), NbtSizeTracker.ofUnlimitedBytes());
 
             NbtList inventoryList = nbtCompound.getList("EnderItems", 10);
+
+            InventoryGui.savePreRestorePlayerInventory(playerName,
+                    inventoryList.toString(),
+                    null,
+                    null,
+                    null,
+                    false,
+                    0
+            );
+
+
             inventoryList.clear();
 
             int index = 0;

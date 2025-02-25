@@ -83,15 +83,15 @@ public class InventoryGui extends SimpleGui {
                 .build());
     }
 
-    private static void savePreRestorePlayerInventory(String playerName, String inventory, String armor, String offHand, String enderChest, int xp){
+    protected static void savePreRestorePlayerInventory(String playerName, String inventory, String armor, String offHand, String enderChest, boolean isInventory,int xp){
         BorukvaInventoryBackup.getDatabaseManagerActor().tell(
-                new BActorMessages.SavePlayerDataOnPlayerRestore(playerName, inventory, armor, offHand, enderChest, xp), ActorRef.noSender());
+                new BActorMessages.SavePlayerDataOnPlayerRestore(playerName, inventory, armor, offHand, enderChest, isInventory, xp), ActorRef.noSender());
 
     }
 
-    private static void savePreRestorePlayerInventory(String playerName, NbtList inventory, NbtList enderChest, int xp){
+    protected static void savePreRestorePlayerInventory(String playerName, NbtList inventory, NbtList enderChest, boolean isInventory,int xp){
         BorukvaInventoryBackup.getDatabaseManagerActor().tell(
-                new BActorMessages.SavePlayerDataOnPlayerRestoreNbt(playerName, inventory, enderChest, xp), ActorRef.noSender());
+                new BActorMessages.SavePlayerDataOnPlayerRestoreNbt(playerName, inventory, enderChest, isInventory, xp), ActorRef.noSender());
 
     }
 
@@ -122,6 +122,7 @@ public class InventoryGui extends SimpleGui {
                 playerItems(playerInventory.armor, player).toString(),
                 playerItems(playerInventory.offHand, player).toString(),
                 playerItems(player.getEnderChestInventory().heldStacks, player).toString(),
+                true,
                 xp
                 );
 
@@ -155,7 +156,7 @@ public class InventoryGui extends SimpleGui {
             NbtList inventoryList = nbtCompound.getList("Inventory", 10);
             NbtList enderChestLists = nbtCompound.getList("EnderItems", 10);
 
-            savePreRestorePlayerInventory(playerName, inventoryList, enderChestLists, xp);
+            savePreRestorePlayerInventory(playerName, inventoryList, enderChestLists, true,xp);
 
             inventoryList.clear();
 

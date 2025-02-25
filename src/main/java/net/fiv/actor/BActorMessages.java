@@ -12,8 +12,8 @@ public final class BActorMessages {
     public record SavePlayerDataOnPlayerDeath(ServerPlayerEntity player, DamageSource source) {}
     public record SavePlayerDataOnPlayerConnect(ServerPlayerEntity player) {}
     public record SavePlayerDataOnPlayerLogout(ServerPlayerEntity player) {}
-    public record SavePlayerDataOnPlayerRestore(String playerName, String inventory, String armor, String offHand, String enderChest, int xp) {}
-    public record SavePlayerDataOnPlayerRestoreNbt(String playerName, NbtList inventory, NbtList enderChest, int xp) {}
+    public record SavePlayerDataOnPlayerRestore(String playerName, String inventory, String armor, String offHand, String enderChest, boolean isInventory,int xp) {}
+    public record SavePlayerDataOnPlayerRestoreNbt(String playerName, NbtList inventory, NbtList enderChest, boolean isInventory,int xp) {}
     public record GetDeathTableMap(ServerPlayerEntity player, String playerName) {}
     public record GetLogoutTableMap(ServerPlayerEntity player, String playerName) {}
     public record GetLoginTableMap(ServerPlayerEntity player, String playerName) {}

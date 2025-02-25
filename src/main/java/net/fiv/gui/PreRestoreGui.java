@@ -51,14 +51,20 @@ public class PreRestoreGui extends SimpleGui {
             String offHand = this.preRestoreTableList.get(tableSize-i-1).getOffHand();
             String enderChest = this.preRestoreTableList.get(tableSize-i-1).getEnderChest();
             int xp = this.preRestoreTableList.get(tableSize-i-1).getXp();
+            boolean isInventory = this.preRestoreTableList.get(tableSize-i-1).isTableType();
 
-            this.setSlot(inventory_index, new GuiElementBuilder(Items.CHEST)
+            this.setSlot(inventory_index, new GuiElementBuilder(isInventory ? Items.CHEST : Items.ENDER_CHEST)
                     .setName(Text.literal("Time: "+this.preRestoreTableList.get(tableSize-i-1).getDate()))
                     .addLoreLine(Text.literal("XpLevel: "+this.preRestoreTableList.get(tableSize-i-1).getXp()))
                     .setCallback((index, type, action) -> {
                         Map<Integer, ItemStack> itemStackList = TableListGui.inventorySerialization(inventory, armor, offHand, player);
                         Map<Integer, ItemStack> enderChestItemStackList = TableListGui.inventorySerialization(enderChest, player);
-                        new InventoryGui(player, this.preRestoreTableList.getFirst().getName(), itemStackList, enderChestItemStackList,xp, this).open();
+                        if(isInventory){
+                            new InventoryGui(player, this.preRestoreTableList.getFirst().getName(), itemStackList, enderChestItemStackList,xp, this).open();
+                        } else {
+                            new EnderChestGui(player, this.preRestoreTableList.getFirst().getName(), itemStackList, this).open();
+                        }
+
                     })
                     .build());
 

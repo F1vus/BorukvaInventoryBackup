@@ -80,10 +80,10 @@ public class BorukvaInventoryBackupDB {
         logoutTableDao.create(logoutTable);
     }
 
-    public void addDataPreRestore(String name, String date, String inventory, String armor, String offHand, String enderChest, int xp) throws SQLException{
+    public void addDataPreRestore(String name, String date, String inventory, String armor, String offHand, String enderChest, boolean isInventory,int xp) throws SQLException{
         deleteOldestRecord(name, preRestoreTableDao);
 
-        PreRestoreTable preRestoreTable = new PreRestoreTable(name, date, inventory, armor, offHand, enderChest, xp);
+        PreRestoreTable preRestoreTable = new PreRestoreTable(name, date, inventory, armor, offHand, enderChest, isInventory,xp);
 
         preRestoreTableDao.create(preRestoreTable);
     }

@@ -219,7 +219,7 @@ public class DatabaseManagerActor extends AbstractActor {
         String formattedLoginTime = loginTime.replace("T", " ").split("\\.")[0];
 
         try{
-            borukvaInventoryBackupDB.addDataPreRestore(msg.playerName(), formattedLoginTime, msg.inventory(), msg.armor(), msg.offHand(), msg.enderChest(), msg.xp());
+            borukvaInventoryBackupDB.addDataPreRestore(msg.playerName(), formattedLoginTime, msg.inventory(), msg.armor(), msg.offHand(), msg.enderChest(), msg.isInventory(), msg.xp());
         }catch (SQLException e){
             throw new SQLExceptionWrapper(e);
         }
@@ -246,7 +246,7 @@ public class DatabaseManagerActor extends AbstractActor {
         String formattedLoginTime = loginTime.replace("T", " ").split("\\.")[0];
 
         try{
-            borukvaInventoryBackupDB.addDataPreRestore(msg.playerName(), formattedLoginTime, mainInventory.toString(), armor.toString(), offHand.toString(), msg.enderChest().toString(), msg.xp());
+            borukvaInventoryBackupDB.addDataPreRestore(msg.playerName(), formattedLoginTime, mainInventory.toString(), armor.toString(), offHand.toString(), msg.enderChest().toString(), msg.isInventory(),msg.xp());
         }catch (SQLException e){
             throw new SQLExceptionWrapper(e);
         }

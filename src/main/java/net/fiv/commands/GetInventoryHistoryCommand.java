@@ -15,7 +15,7 @@ public class GetInventoryHistoryCommand {
     public static void registerCommand() {
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(
                 CommandManager.literal("binvbackup")
-                        .requires(Permissions.require("borukva.rollback.permission", 4))
+                        .requires(Permissions.require("borukva.rollback", 4))
                         .then(CommandManager
                                 .argument("player", StringArgumentType.string())
                                 .executes(GetInventoryHistoryCommand::getInventoryHistory))));

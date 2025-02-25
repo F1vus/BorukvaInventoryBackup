@@ -35,7 +35,10 @@ public class PreRestoreTable implements Table {
     @DatabaseField(dataType = DataType.INTEGER)
     private int xp;
 
-    public PreRestoreTable(String name, String date, String inventory, String armor, String offHand, String enderChest, int xp){
+    @DatabaseField(dataType = DataType.BOOLEAN)
+    private boolean tableType;
+
+    public PreRestoreTable(String name, String date, String inventory, String armor, String offHand, String enderChest, boolean tableType, int xp){
         this.name = name;
         this.date = date;
         this.inventory = inventory;
@@ -43,6 +46,7 @@ public class PreRestoreTable implements Table {
         this.offHand = offHand;
         this.enderChest = enderChest;
         this.xp = xp;
+        this.tableType = tableType;
 
     }
 
