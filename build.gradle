@@ -46,7 +46,7 @@ dependencies {
 	include(implementation("mysql:mysql-connector-java:8.0.33"))
 
 	// Akka actors
-	include (implementation 'com.typesafe.akka:akka-actor_3:2.9.4')
+	include (implementation 'com.typesafe.akka:akka-actor_3:2.6.11')
 //	include (implementation 'com.typesafe.akka:akka-actor-typed_3:2.9.4')
 	include (implementation 'com.typesafe:config:1.4.3')
 	include (implementation 'org.scala-lang:scala3-library_3:3.3.3')
