@@ -14,85 +14,81 @@ import java.util.*;
 
 @Setter
 public class LogoutHistoryGui extends SimpleGui {
-    private static HashMap<String, Integer> playerIndices = new HashMap<>();
+    private int page;
 
-    private List<LogoutTable> logoutTableList = new ArrayList<>();
+    private List<LogoutTable> logoutTableList;
 
-    public LogoutHistoryGui(ServerPlayerEntity player) {
+    public LogoutHistoryGui(ServerPlayerEntity player, int page, List<LogoutTable> logoutTables) {
         super(ScreenHandlerType.GENERIC_9X6, player, false);
 
+        this.logoutTableList = logoutTables;
+        this.page = page;
+
+        addButtons();
     }
 
     @Override
     public boolean canPlayerClose() {
-        TableListGui.activeTables.remove(this.player.getName().getString());
         return true;
     }
 
 
-    public void addButtons(){
-        this.setSlot(53, new GuiElementBuilder(Items.ARMOR_STAND)
-                .setName(Text.literal("NextPage"))
-                .setCallback((index, type, action) -> {
-                    List<SimpleGui> guiList = TableListGui.activeTables.get(player.getName().getString());
-                    if (guiList != null && !guiList.isEmpty()) {
-                        String playerName = player.getName().getString();
+    private void addButtons(){
+        int firstIndex = this.page * 45;
+        int tableSize = this.logoutTableList.size();
+        int lastIndex = Math.min(firstIndex + 45, tableSize);
 
-                        int currentIndex = getCurrentIndex(guiList.size());
-                        playerIndices.put(playerName, currentIndex);
+        for(int i=firstIndex; i<lastIndex; i++){
 
-                        LogoutHistoryGui logoutHistoryGui = (LogoutHistoryGui) guiList.get(currentIndex);
-                        logoutHistoryGui.addButtons();
-                        logoutHistoryGui.open();
-                    }
-                })
-                .build());
+            int inventory_index = i-firstIndex;
 
-        this.setSlot(52, new GuiElementBuilder(Items.ARMOR_STAND)
-                .setName(Text.literal("PreviousPage"))
-                .setCallback((index, type, action) -> {
-                    List<SimpleGui> guiList = TableListGui.activeTables.get(player.getName().getString());
-                    if (guiList != null && !guiList.isEmpty()) {
-                        String playerName = player.getName().getString();
+            if(inventory_index>44) break;
 
-                        int currentIndex = getCurrentIndex(guiList.size());
-                        playerIndices.put(playerName, currentIndex);
-
-                        LogoutHistoryGui logoutHistoryGui = (LogoutHistoryGui) guiList.get(currentIndex);
-                        logoutHistoryGui.addButtons();
-                        logoutHistoryGui.open();
-                    }
-                })
-                .build());
-
-
-        for(int i=0; i<logoutTableList.size(); i++){
-            String inventory = logoutTableList.get(i).getInventory();
-            String armor = logoutTableList.get(i).getArmor();
-            String offHand = logoutTableList.get(i).getOffHand();
-            int xp = logoutTableList.get(i).getXp();
-            this.setSlot(i, new GuiElementBuilder(Items.CHEST)
-                    .setName(Text.literal("Time: "+logoutTableList.get(i).getDate()))
-                    .addLoreLine(Text.literal("World: "+logoutTableList.get(i).getWorld()))
-                    .addLoreLine(Text.literal("Place: "+logoutTableList.get(i).getPlace()))
-                    .addLoreLine(Text.literal("XpLevel: "+logoutTableList.get(i).getXp()))
+            String inventory = this.logoutTableList.get(tableSize-i-1).getInventory();
+            String armor = this.logoutTableList.get(tableSize-i-1).getArmor();
+            String offHand = this.logoutTableList.get(tableSize-i-1).getOffHand();
+            String enderChest = this.logoutTableList.get(tableSize-i-1).getEnderChest();
+            int xp = this.logoutTableList.get(tableSize-i-1).getXp();
+            this.setSlot(inventory_index, new GuiElementBuilder(Items.CHEST)
+                    .setName(Text.literal("Time: "+this.logoutTableList.get(tableSize-i-1).getDate()))
+                    .addLoreLine(Text.literal("World: "+this.logoutTableList.get(tableSize-i-1).getWorld()))
+                    .addLoreLine(Text.literal("Place: "+this.logoutTableList.get(tableSize-i-1).getPlace()))
+                    .addLoreLine(Text.literal("XpLevel: "+this.logoutTableList.get(tableSize-i-1).getXp()))
                     .setCallback((index, type, action) -> {
                         Map<Integer, ItemStack> itemStackList = TableListGui.inventorySerialization(inventory, armor, offHand, player);
-                        new InventoryGui(player, logoutTableList.getFirst().getName(), itemStackList, xp).open();
+                        Map<Integer, ItemStack> enderChestItemStackList = TableListGui.inventorySerialization(enderChest, player);
+                        new InventoryGui(player, this.logoutTableList.getFirst().getName(), itemStackList, enderChestItemStackList,xp, this).open();
+                    })
+                    .build());
+
+
+        }
+
+        if (lastIndex < this.logoutTableList.size()) {
+            this.setSlot(53, new GuiElementBuilder(Items.ARROW)
+                    .setName(Text.literal("Next Page"))
+                    .setCallback((index, type, action) -> {
+                        new LogoutHistoryGui(player, page+1, this.logoutTableList).open();
+                    })
+                    .build());
+        }
+
+        this.setSlot(49, new GuiElementBuilder(Items.EMERALD)
+                .setName(Text.literal("Back to tables list"))
+                .setCallback((index, type, action) -> {
+                    new TableListGui(player, logoutTableList.getFirst().getName()).open();
+                })
+                .build());
+
+        if (page > 0) {
+            this.setSlot(45, new GuiElementBuilder(Items.ARROW)
+                    .setName(Text.literal("Previous Page"))
+                    .setCallback((index, type, action) -> {
+                        new LogoutHistoryGui(player, page-1, this.logoutTableList).open();
                     })
                     .build());
         }
 //        System.out.println(TableListGui.activeTables);
     }
 
-    private int getCurrentIndex(int guiListSize){
-        String playerName = player.getName().getString();
-        int currentIndex = playerIndices.getOrDefault(playerName, 0);
-        currentIndex--;
-        if (currentIndex < 0) {
-            currentIndex = guiListSize - 1;
-            return currentIndex;
-        }
-        return currentIndex;
-    }
 }

@@ -3,7 +3,7 @@
 	"id": "borukva_inventory_backup",
 	"version": "${version}",
 	"name": "borukva_inventory_backup",
-	"description": "From Fiv_ to Borukwa",
+	"description": "From Fiv_ to Borukva",
 	"authors": [
 		"Fiv_"
 	],

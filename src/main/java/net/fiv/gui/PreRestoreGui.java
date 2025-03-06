@@ -3,7 +3,7 @@ package net.fiv.gui;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import lombok.Setter;
-import net.fiv.data_base.entities.DeathTable;
+import net.fiv.data_base.entities.PreRestoreTable;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.screen.ScreenHandlerType;
@@ -13,16 +13,16 @@ import net.minecraft.text.Text;
 import java.util.*;
 
 @Setter
-public class DeathHistoryGui extends SimpleGui {
+public class PreRestoreGui extends SimpleGui {
 
     private int page;
 
-    private List<DeathTable> deathTableList;
+    private List<PreRestoreTable> preRestoreTableList;
 
-    public DeathHistoryGui(ServerPlayerEntity player, int page, List<DeathTable> deathTables) {
+    public PreRestoreGui(ServerPlayerEntity player, int page, List<PreRestoreTable> preRestoreTables) {
         super(ScreenHandlerType.GENERIC_9X6, player, false);
 
-        this.deathTableList = deathTables;
+        this.preRestoreTableList = preRestoreTables;
         this.page = page;
 
         addButtons();
@@ -37,7 +37,7 @@ public class DeathHistoryGui extends SimpleGui {
 
     private void addButtons(){
         int firstIndex = this.page * 45;
-        int tableSize = this.deathTableList.size();
+        int tableSize = this.preRestoreTableList.size();
         int lastIndex = Math.min(firstIndex + 45, tableSize);
 
 
@@ -46,32 +46,35 @@ public class DeathHistoryGui extends SimpleGui {
 
             if(inventory_index>44) break;
             //System.out.println("Size: "+tableSize+" Ref: "+(tableSize-i));
-            String inventory = this.deathTableList.get(tableSize-i-1).getInventory();
-            String armor = this.deathTableList.get(tableSize-i-1).getArmor();
-            String offHand = this.deathTableList.get(tableSize-i-1).getOffHand();
-            String enderChest = this.deathTableList.get(tableSize-i-1).getEnderChest();
-            int xp = this.deathTableList.get(tableSize-i-1).getXp();
+            String inventory = this.preRestoreTableList.get(tableSize-i-1).getInventory();
+            String armor = this.preRestoreTableList.get(tableSize-i-1).getArmor();
+            String offHand = this.preRestoreTableList.get(tableSize-i-1).getOffHand();
+            String enderChest = this.preRestoreTableList.get(tableSize-i-1).getEnderChest();
+            int xp = this.preRestoreTableList.get(tableSize-i-1).getXp();
+            boolean isInventory = this.preRestoreTableList.get(tableSize-i-1).isTableType();
 
-            this.setSlot(inventory_index, new GuiElementBuilder(Items.CHEST)
-                    .setName(Text.literal("Time: "+this.deathTableList.get(tableSize-i-1).getDate()))
-                    .addLoreLine(Text.literal("Death reason: "+this.deathTableList.get(tableSize-i-1).getReason()))
-                    .addLoreLine(Text.literal("World: "+this.deathTableList.get(tableSize-i-1).getWorld()))
-                    .addLoreLine(Text.literal("Place: "+this.deathTableList.get(tableSize-i-1).getPlace()))
-                    .addLoreLine(Text.literal("XpLevel: "+this.deathTableList.get(tableSize-i-1).getXp()))
+            this.setSlot(inventory_index, new GuiElementBuilder(isInventory ? Items.CHEST : Items.ENDER_CHEST)
+                    .setName(Text.literal("Time: "+this.preRestoreTableList.get(tableSize-i-1).getDate()))
+                    .addLoreLine(Text.literal("XpLevel: "+this.preRestoreTableList.get(tableSize-i-1).getXp()))
                     .setCallback((index, type, action) -> {
                         Map<Integer, ItemStack> itemStackList = TableListGui.inventorySerialization(inventory, armor, offHand, player);
                         Map<Integer, ItemStack> enderChestItemStackList = TableListGui.inventorySerialization(enderChest, player);
-                        new InventoryGui(player, this.deathTableList.getFirst().getName(), itemStackList, enderChestItemStackList,xp, this).open();
+                        if(isInventory){
+                            new InventoryGui(player, this.preRestoreTableList.getFirst().getName(), itemStackList, enderChestItemStackList,xp, this).open();
+                        } else {
+                            new EnderChestGui(player, this.preRestoreTableList.getFirst().getName(), itemStackList, this).open();
+                        }
+
                     })
                     .build());
 
         }
 
-        if (lastIndex < this.deathTableList.size()) {
+        if (lastIndex < this.preRestoreTableList.size()) {
             this.setSlot(53, new GuiElementBuilder(Items.ARROW)
                     .setName(Text.literal("Next Page"))
                     .setCallback((index, type, action) -> {
-                        new DeathHistoryGui(player, page + 1, this.deathTableList).open();
+                        new PreRestoreGui(player, page + 1, this.preRestoreTableList).open();
                     })
                     .build());
         }
@@ -79,7 +82,7 @@ public class DeathHistoryGui extends SimpleGui {
         this.setSlot(49, new GuiElementBuilder(Items.EMERALD)
                 .setName(Text.literal("Back to tables list"))
                 .setCallback((index, type, action) -> {
-                    new TableListGui(player, deathTableList.getFirst().getName()).open();
+                    new TableListGui(player, preRestoreTableList.getFirst().getName()).open();
                 })
                 .build());
 
@@ -87,7 +90,7 @@ public class DeathHistoryGui extends SimpleGui {
             this.setSlot(45, new GuiElementBuilder(Items.ARROW)
                     .setName(Text.literal("Previous Page"))
                     .setCallback((index, type, action) -> {
-                        new DeathHistoryGui(player, page - 1, this.deathTableList).open();
+                        new PreRestoreGui(player, page - 1, this.preRestoreTableList).open();
                     })
                     .build());
         }

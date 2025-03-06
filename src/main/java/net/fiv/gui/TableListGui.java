@@ -17,12 +17,11 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
-import java.util.*;
-import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 public class TableListGui extends SimpleGui {
 
-    public static HashMap<String, List<SimpleGui>> activeTables = new HashMap<>();
 
     public TableListGui(ServerPlayerEntity player, String playerName) {
         super(ScreenHandlerType.GENERIC_9X1, player, false);
@@ -32,38 +31,36 @@ public class TableListGui extends SimpleGui {
     }
 
     private void addButtons(String playerName){
-        this.setSlot(3, new GuiElementBuilder(Items.CHEST)
-                .setName(Text.literal("Історія входів").formatted(Formatting.GREEN, Formatting.BOLD))
+        this.setSlot(2, new GuiElementBuilder(Items.CHEST)
+                .setName(Text.literal("Login history").formatted(Formatting.GREEN, Formatting.BOLD))
                 .setCallback((index, type, action) -> {
-                    GetInventoryHistoryCommand.addLoginTableMap(player, playerName);
-                    LoginHistoryGui loginHistoryGui = (LoginHistoryGui) activeTables.get(this.player.getName().getString()).getFirst();
-
-                    loginHistoryGui.addButtons();
-                    loginHistoryGui.open();
-                        })
+                    GetInventoryHistoryCommand.getLoginTableMap(player, playerName);
+                })
 
                 .build());
 
-        this.setSlot(4, new GuiElementBuilder(Items.CHEST)
-                .setName(Text.literal("Історія виходів").formatted(Formatting.YELLOW, Formatting.BOLD))
+        this.setSlot(3, new GuiElementBuilder(Items.CHEST)
+                .setName(Text.literal("Logout history").formatted(Formatting.YELLOW, Formatting.BOLD))
                 .setCallback((index, type, action) -> {
-                    GetInventoryHistoryCommand.addLogoutTableMap(player, playerName);
-                    LogoutHistoryGui logoutHistoryGui = (LogoutHistoryGui) activeTables.get(this.player.getName().getString()).getFirst();
-
-                    logoutHistoryGui.addButtons();
-                    logoutHistoryGui.open();
+                    GetInventoryHistoryCommand.getLogoutTableMap(player, playerName);
                 })
 
                 .build());
 
         this.setSlot(5, new GuiElementBuilder(Items.CHEST)
-                .setName(Text.literal("Історія смертей").formatted(Formatting.RED, Formatting.BOLD))
+                .setName(Text.literal("Death history").formatted(Formatting.RED, Formatting.BOLD))
                 .setCallback((index, type, action) -> {
-                    GetInventoryHistoryCommand.addDeathTableMap(player, playerName);
-                    DeathHistoryGui deathHistoryGui = (DeathHistoryGui) activeTables.get(this.player.getName().getString()).getFirst();
+                    GetInventoryHistoryCommand.getDeathTableMap(player, playerName);
 
-                    deathHistoryGui.addButtons();
-                    deathHistoryGui.open();
+                })
+
+                .build());
+
+        this.setSlot(6, new GuiElementBuilder(Items.CHEST)
+                .setName(Text.literal("Backups history").formatted(Formatting.DARK_GRAY, Formatting.BOLD))
+                .setCallback((index, type, action) -> {
+                    GetInventoryHistoryCommand.getPreRestoreTableMap(player, playerName);
+
                 })
 
                 .build());
@@ -75,8 +72,9 @@ public class TableListGui extends SimpleGui {
         Map<Integer, ItemStack> itemsToGive = new HashMap<>();
 
         NbtCompound nbtCompoundArmor = InventorySerializer.deserializeInventory(armor);
-       // System.out.println("armor: "+armor);
+        //System.out.println("armor: "+armor);
         NbtList nbtListArmor = nbtCompoundArmor.getList("Inventory", 10);
+        //System.out.println("NbtArmor "+ nbtListArmor.toString());
 
         int index = 0;
         for(NbtElement nbtElement: nbtListArmor){
@@ -156,4 +154,36 @@ public class TableListGui extends SimpleGui {
         return itemsToGive;
     }
 
+    protected static Map<Integer, ItemStack> inventorySerialization(String enderChest, ServerPlayerEntity player) {
+        World world = player.getWorld();
+
+        Map<Integer, ItemStack> itemsToGive = new HashMap<>();
+
+        NbtCompound nbtCompoundArmor = InventorySerializer.deserializeInventory(enderChest);
+        //System.out.println("armor: "+armor);
+        NbtList nbtListArmor = nbtCompoundArmor.getList("Inventory", 10);
+        //System.out.println("NbtArmor "+ nbtListArmor.toString());
+
+        int index = 0;
+        for (NbtElement nbtElement : nbtListArmor) {
+            NbtCompound itemNbt = (NbtCompound) nbtElement;
+
+            //System.out.println("SlotByte: "+itemNbt.getByte("Slot"));
+            ItemStack itemStack;
+            //System.out.println("BLOCKTAG: "+itemNbt.getString("id")); //
+            if (itemNbt.contains("components")) {
+
+                itemStack = ItemStack.fromNbt(world.getRegistryManager(), nbtElement).get();
+
+            } else if (Registries.ITEM.get(Identifier.of(itemNbt.getString("id"))).equals(Items.AIR)) {
+                itemStack = new ItemStack(Items.AIR);
+            } else {
+                itemStack = new ItemStack(Registries.ITEM.get(Identifier.of(itemNbt.getString("id"))), itemNbt.getInt("Count"));
+            }
+
+            itemsToGive.put(index, itemStack);
+            index++;
+        }
+        return itemsToGive;
+    }
 }

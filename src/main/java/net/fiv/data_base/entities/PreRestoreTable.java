@@ -8,8 +8,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@DatabaseTable(tableName = "death_table")
-public class DeathTable implements Table {
+@DatabaseTable(tableName = "pre_restore_table")
+public class PreRestoreTable implements Table {
 
     @DatabaseField(generatedId = true)
     private int id;
@@ -18,16 +18,7 @@ public class DeathTable implements Table {
     private String name;
 
     @DatabaseField(dataType = DataType.STRING)
-    private String world;
-
-    @DatabaseField(dataType = DataType.STRING)
-    private String place;
-
-    @DatabaseField(dataType = DataType.STRING)
     private String date;
-
-    @DatabaseField(dataType = DataType.STRING)
-    private String reason;
 
     @DatabaseField(dataType = DataType.LONG_STRING)
     private String inventory;
@@ -44,21 +35,22 @@ public class DeathTable implements Table {
     @DatabaseField(dataType = DataType.INTEGER)
     private int xp;
 
-    public DeathTable(String name, String world, String place, String date, String reason,String inventory,
-                       String armor, String offHand, String enderChest, int xp) {
+    @DatabaseField(dataType = DataType.BOOLEAN)
+    private boolean tableType;
+
+    public PreRestoreTable(String name, String date, String inventory, String armor, String offHand, String enderChest, boolean tableType, int xp){
         this.name = name;
-        this.world = world;
-        this.place = place;
         this.date = date;
-        this.reason = reason;
         this.inventory = inventory;
         this.armor = armor;
         this.offHand = offHand;
         this.enderChest = enderChest;
         this.xp = xp;
+        this.tableType = tableType;
+
     }
 
-    public DeathTable(){
+    public PreRestoreTable(){
     }
 
 }

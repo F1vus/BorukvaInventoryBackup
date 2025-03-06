@@ -1,11 +1,13 @@
 package net.fiv.gui;
 
+import akka.actor.ActorRef;
 import com.mojang.authlib.GameProfile;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.DynamicOps;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.fiv.BorukvaInventoryBackup;
+import net.fiv.actor.BActorMessages;
 import net.minecraft.component.ComponentChanges;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -16,6 +18,7 @@ import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.UserCache;
 import net.minecraft.util.WorldSavePath;
 
@@ -23,45 +26,73 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.*;
 
-public class
-InventoryGui extends SimpleGui {
+public class InventoryGui extends SimpleGui {
 
-    public InventoryGui(ServerPlayerEntity player, String playerName, Map<Integer, ItemStack> itemStackMap, int xp) {
+    public InventoryGui(ServerPlayerEntity player, String playerName, Map<Integer, ItemStack> itemStackMap, Map<Integer, ItemStack> enderChestMap,int xp, SimpleGui caller) {
         super(ScreenHandlerType.GENERIC_9X6, player, false);
 
-        addItems(itemStackMap, xp, playerName);
+        addItems(itemStackMap, enderChestMap,xp, playerName,caller);
     }
 
 
-    private void addItems(Map<Integer, ItemStack> itemStackMap, int xp, String playerName){
+    private void addItems(Map<Integer, ItemStack> itemStackMap, Map<Integer, ItemStack> enderChestMap,int xp, String playerName, SimpleGui caller){
         int i = 0;
         for(ItemStack item: itemStackMap.values()){
-            this.setSlot(i, new GuiElementBuilder(item.getItem())
+            this.setSlot(i, new GuiElementBuilder(item)
+                    .setCount(item.getCount())
                     .build());
             i++;
         }
 
+
+
         this.setSlot(53, new GuiElementBuilder(Items.PAPER)
-                .setName(Text.literal("Backup player inventory"))
+                .setName(Text.literal("Backup player inventory(recovery will be irreversible)").formatted(Formatting.RED, Formatting.BOLD))
                 .setCallback((index, type, action) -> {
                     UUID uuid = getOfflinePlayerProfile(playerName, player.getServer());
 
                     if(this.player.getServer().getPlayerManager().getPlayer(playerName) != null){
                         backUpPlayerItems(itemStackMap, xp,this.player.getServer().getPlayerManager().getPlayer(playerName));
+                        this.getPlayer().sendMessage(Text.literal("You have successfully restored items to an online player!").formatted(Formatting.GREEN, Formatting.BOLD));
                     } else {
-                        saveOfflinePlayerInventory(uuid, xp,itemStackMap);
+                        saveOfflinePlayerInventory(uuid, xp,itemStackMap, playerName);
+                        this.getPlayer().sendMessage(Text.literal("You have successfully restored items to an offline player!").formatted(Formatting.GREEN, Formatting.BOLD));
+
                     }
 
                 })
                 .build());
 
-        this.setSlot(52, new GuiElementBuilder(Items.PAPER)
-                .setName(Text.literal("Go back"))
+        this.setSlot(47, new GuiElementBuilder(Items.ENDER_CHEST)
+                .setName(Text.literal("Player ender chest").formatted(Formatting.DARK_PURPLE))
                 .setCallback((index, type, action) -> {
-                    TableListGui.activeTables.get(player.getName().getString()).getFirst().open();
+                    new EnderChestGui(player, playerName,enderChestMap, this).open();
+                })
+                .build());
+
+        this.setSlot(46, new GuiElementBuilder(Items.EXPERIENCE_BOTTLE)
+                .setName(Text.literal("XP level: "+xp).formatted(Formatting.YELLOW))
+                .build());
+
+        this.setSlot(45, new GuiElementBuilder(Items.EMERALD)
+                .setName(Text.literal("Return back"))
+                .setCallback((index, type, action) -> {
+                    caller.open();
 
                 })
                 .build());
+    }
+
+    protected static void savePreRestorePlayerInventory(String playerName, String inventory, String armor, String offHand, String enderChest, boolean isInventory,int xp){
+        BorukvaInventoryBackup.getDatabaseManagerActor().tell(
+                new BActorMessages.SavePlayerDataOnPlayerRestore(playerName, inventory, armor, offHand, enderChest, isInventory, xp), ActorRef.noSender());
+
+    }
+
+    protected static void savePreRestorePlayerInventory(String playerName, NbtList inventory, NbtList enderChest, boolean isInventory,int xp){
+        BorukvaInventoryBackup.getDatabaseManagerActor().tell(
+                new BActorMessages.SavePlayerDataOnPlayerRestoreNbt(playerName, inventory, enderChest, isInventory, xp), ActorRef.noSender());
+
     }
 
     public static UUID getOfflinePlayerProfile(String playerName, MinecraftServer server) {
@@ -85,14 +116,26 @@ InventoryGui extends SimpleGui {
 
         int index = 0;
         PlayerInventory playerInventory = player.getInventory();
+
+        savePreRestorePlayerInventory(player.getName().getString(),
+                playerItems(playerInventory.main, player).toString(),
+                playerItems(playerInventory.armor, player).toString(),
+                playerItems(playerInventory.offHand, player).toString(),
+                playerItems(player.getEnderChestInventory().heldStacks, player).toString(),
+                true,
+                xp
+                );
+
+        playerInventory.clear();
         //System.out.println("Back: "+itemStackMap);
         for(ItemStack itemStack: itemStackMap.values()){
+            //System.out.println("Size"+playerInventory.size());
             if(index < 4){
-                playerInventory.insertStack(36+index, itemStack);
+                playerInventory.setStack(36+index, itemStack);
             } else if (index==4) {
-                playerInventory.insertStack(40, itemStack);
+                playerInventory.setStack(40, itemStack);
             } else {
-                playerInventory.insertStack(index-5, itemStack);
+                playerInventory.setStack(index-5, itemStack);
             }
             //System.out.println("index: "+index);
             index++;
@@ -101,7 +144,7 @@ InventoryGui extends SimpleGui {
 
     }
 
-    private void saveOfflinePlayerInventory(UUID uuid, int xp, Map<Integer, ItemStack> itemStackMap) {
+    private void saveOfflinePlayerInventory(UUID uuid, int xp, Map<Integer, ItemStack> itemStackMap, String playerName) {
         File playerDataDir = this.player.getServer().getSavePath(WorldSavePath.PLAYERDATA).toFile();
 
 //        System.out.println(playerDataDir);
@@ -111,6 +154,10 @@ InventoryGui extends SimpleGui {
             NbtCompound nbtCompound = NbtIo.readCompressed(new FileInputStream(file2), NbtSizeTracker.ofUnlimitedBytes());
 
             NbtList inventoryList = nbtCompound.getList("Inventory", 10);
+            NbtList enderChestLists = nbtCompound.getList("EnderItems", 10);
+
+            savePreRestorePlayerInventory(playerName, inventoryList, enderChestLists, true,xp);
+
             inventoryList.clear();
 
             int index = 0;
@@ -168,7 +215,6 @@ InventoryGui extends SimpleGui {
 
         for(ItemStack itemStack: inventory){
             NbtCompound nbt = getItemStackNbt(itemStack, player.getRegistryManager().getOps(NbtOps.INSTANCE));
-
             playerItems.add(nbt.toString());
         }
 
