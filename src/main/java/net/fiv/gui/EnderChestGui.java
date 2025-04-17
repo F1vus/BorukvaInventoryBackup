@@ -69,10 +69,7 @@ public class EnderChestGui extends SimpleGui {
 
         this.setSlot(27, new GuiElementBuilder(Items.EMERALD)
                 .setName(Text.literal("Return back"))
-                .setCallback((index, type, action) -> {
-                    caller.open();
-
-                })
+                .setCallback((index, type, action) -> caller.open())
                 .build());
     }
 

@@ -74,9 +74,7 @@ public class InventoryGui extends SimpleGui {
 
         this.setSlot(47, new GuiElementBuilder(Items.ENDER_CHEST)
                 .setName(Text.literal("Player ender chest").formatted(Formatting.DARK_PURPLE))
-                .setCallback((index, type, action) -> {
-                    new EnderChestGui(player, playerName,enderChestMap, this).open();
-                })
+                .setCallback((index, type, action) -> new EnderChestGui(player, playerName,enderChestMap, this).open())
                 .build());
 
         this.setSlot(46, new GuiElementBuilder(Items.EXPERIENCE_BOTTLE)
@@ -85,10 +83,7 @@ public class InventoryGui extends SimpleGui {
 
         this.setSlot(45, new GuiElementBuilder(Items.EMERALD)
                 .setName(Text.literal("Return back"))
-                .setCallback((index, type, action) -> {
-                    caller.open();
-
-                })
+                .setCallback((index, type, action) -> caller.open())
                 .build());
     }
 
