@@ -52,7 +52,7 @@ public class InventoryGui extends SimpleGui {
                     UUID uuid = getOfflinePlayerProfile(playerName, player.getServer());
 
                     if(this.player.getServer().getPlayerManager().getPlayer(playerName) != null){
-                        backUpPlayerItems(itemStackMap, xp,this.player.getServer().getPlayerManager().getPlayer(playerName));
+                        backUpPlayerItems(itemStackMap, xp, this.player.getServer().getPlayerManager().getPlayer(playerName));
                         this.getPlayer().sendMessage(Text.literal("You have successfully restored items to an online player!").formatted(Formatting.GREEN, Formatting.BOLD));
                     } else {
                         saveOfflinePlayerInventory(uuid, xp,itemStackMap, playerName);
@@ -60,6 +60,15 @@ public class InventoryGui extends SimpleGui {
 
                     }
 
+                })
+                .build());
+
+        this.setSlot(51, new GuiElementBuilder(Items.SHULKER_BOX)
+                .setName(Text.literal("Backup player items to the box").formatted(Formatting.GREEN, Formatting.BOLD))
+                .setLore(new ArrayList<>(List.of(Text.literal("clear your inventory before issuing").formatted(Formatting.RED, Formatting.BOLD))))
+                .setCallback((index, type, action) -> {
+                    backUpPlayerItemsToChest(itemStackMap, xp, this.player.getServer().getPlayerManager().getPlayer(playerName), this.player);
+                    this.getPlayer().sendMessage(Text.literal("You have successfully restored items to box!").formatted(Formatting.GREEN, Formatting.BOLD));
                 })
                 .build());
 
@@ -89,9 +98,9 @@ public class InventoryGui extends SimpleGui {
 
     }
 
-    protected static void savePreRestorePlayerInventory(String playerName, NbtList inventory, NbtList enderChest, boolean isInventory,int xp){
+    protected static void savePreRestorePlayerInventory(String playerName, NbtList inventory, NbtList enderChest ,int xp){
         BorukvaInventoryBackup.getDatabaseManagerActor().tell(
-                new BActorMessages.SavePlayerDataOnPlayerRestoreNbt(playerName, inventory, enderChest, isInventory, xp), ActorRef.noSender());
+                new BActorMessages.SavePlayerDataOnPlayerRestoreNbt(playerName, inventory, enderChest, true ,xp), ActorRef.noSender());
 
     }
 
@@ -110,6 +119,8 @@ public class InventoryGui extends SimpleGui {
         }
         return null;
     }
+
+
 
 
     private void backUpPlayerItems(Map<Integer, ItemStack> itemStackMap, int xp,ServerPlayerEntity player){
@@ -156,7 +167,7 @@ public class InventoryGui extends SimpleGui {
             NbtList inventoryList = nbtCompound.getList("Inventory", 10);
             NbtList enderChestLists = nbtCompound.getList("EnderItems", 10);
 
-            savePreRestorePlayerInventory(playerName, inventoryList, enderChestLists, true,xp);
+            savePreRestorePlayerInventory(playerName, inventoryList, enderChestLists ,xp);
 
             inventoryList.clear();
 
@@ -220,6 +231,62 @@ public class InventoryGui extends SimpleGui {
 
         return playerItems;
 
+    }
+
+    public static void backUpPlayerItemsToChest(Map<Integer, ItemStack> itemStackMap, int xp, ServerPlayerEntity player, ServerPlayerEntity operatorPlayer){
+        List<Integer> toRemove = new ArrayList<>();
+
+        itemStackMap.forEach((index, item) -> {
+            if (item.getItem() == Items.AIR) {
+                toRemove.add(index);
+            }
+        });
+
+        toRemove.forEach(itemStackMap::remove);
+
+        List<ItemStack> list = itemStackMap.values().stream().toList();
+
+        ItemStack chest;
+
+        if(itemStackMap.size() > 27){
+
+            chest = createChestItem(list.subList(27, list.size()), player.getName().getString()+" second inventory", operatorPlayer);
+
+            operatorPlayer.dropStack(chest);
+        }
+
+        chest = createChestItem(list.subList(0, Math.min(27, list.size())), player.getName().getString()+" first inventory", operatorPlayer);
+
+        operatorPlayer.dropStack(chest);
+        if(xp != -1)
+            player.setExperienceLevel(xp);
+
+    }
+
+    public static ItemStack createChestItem(List<ItemStack> items, String name, ServerPlayerEntity operatorPlayer) {
+        NbtList containerList = new NbtList();
+
+        for (int i = 0; i < items.size(); i++) {
+            ItemStack stack = items.get(i);
+            if (!stack.isEmpty()) {
+                NbtCompound slotTag = new NbtCompound();
+                NbtCompound nbt = getItemStackNbt(stack, operatorPlayer.getRegistryManager().getOps(NbtOps.INSTANCE));
+                slotTag.put("item", nbt);
+                slotTag.putInt("slot", i); // скриня має слоти від 0 до 26
+                containerList.add(slotTag);
+            }
+        }
+
+        NbtCompound components = new NbtCompound();
+        components.put("minecraft:container", containerList);
+        components.putString("minecraft:item_name", "{\"text\":\"" + name + "\"}");
+
+        NbtCompound blockEntityTag = new NbtCompound();
+        blockEntityTag.put("components", components);
+        blockEntityTag.putInt("count", 1);
+        blockEntityTag.putString("id", "minecraft:chest");
+
+        return ItemStack.fromNbt(operatorPlayer.getWorld().getRegistryManager(), blockEntityTag).get();
     }
 
 }

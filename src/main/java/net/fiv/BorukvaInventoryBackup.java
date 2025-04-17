@@ -17,7 +17,6 @@ import org.slf4j.LoggerFactory;
 public class BorukvaInventoryBackup implements ModInitializer {
 	public static final String MOD_ID = "borukva_inventory_backup";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
-	public static MinecraftServer SERVER;
 	@Getter
 	private static ActorSystem actorSystem;
 	@Getter

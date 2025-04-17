@@ -229,7 +229,6 @@ public class DatabaseManagerActor extends AbstractActor {
         NbtList mainInventory = new NbtList();
         NbtList armor = new NbtList();
         NbtList offHand = new NbtList();
-
         for(NbtElement nbtElement: msg.inventory()) {
             NbtCompound itemNbt = (NbtCompound) nbtElement;
             if(itemNbt.getByte("Slot") >= (byte) 100){
