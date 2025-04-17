@@ -27,7 +27,7 @@ public class BorukvaInventoryBackup implements ModInitializer {
 	public void onInitialize() {
 		ServerLifecycleEvents.SERVER_STARTING.register(this::onServerStarting);
 
-		GetInventoryHistoryCommand.registerCommand();
+		GetInventoryHistoryCommand.registerCommandOfflinePlayer();
 		ModConfigs.registerConfigs();
 
 		actorSystem = ActorSystem.create("BorukvaInventoryBackupActorSystem");
