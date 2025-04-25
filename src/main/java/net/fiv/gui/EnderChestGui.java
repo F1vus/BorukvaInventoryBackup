@@ -15,6 +15,8 @@ import net.minecraft.util.WorldSavePath;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -38,6 +40,16 @@ public class EnderChestGui extends SimpleGui {
                     .build());
             i++;
         }
+
+        this.setSlot(33, new GuiElementBuilder(Items.SHULKER_BOX)
+                .setName(Text.literal("Backup player items to the box").formatted(Formatting.GREEN, Formatting.BOLD))
+                .setLore(new ArrayList<>(List.of(Text.literal("clear your inventory before issuing").formatted(Formatting.RED, Formatting.BOLD))))
+                .setCallback((index, type, action) -> {
+                    InventoryGui.backUpPlayerItemsToChest(enderChestMap, -1,this.player.getServer().getPlayerManager().getPlayer(playerName), this.player);
+                    this.getPlayer().sendMessage(Text.literal("You have successfully restored items to box!").formatted(Formatting.GREEN, Formatting.BOLD));
+                })
+                .build());
+
         this.setSlot(35, new GuiElementBuilder(Items.PAPER)
                 .setName(Text.literal("Backup player ender chest(recovery will be irreversible)").formatted(Formatting.RED, Formatting.BOLD))
                 .setCallback((index, type, action) -> {
@@ -57,10 +69,7 @@ public class EnderChestGui extends SimpleGui {
 
         this.setSlot(27, new GuiElementBuilder(Items.EMERALD)
                 .setName(Text.literal("Return back"))
-                .setCallback((index, type, action) -> {
-                    caller.open();
-
-                })
+                .setCallback((index, type, action) -> caller.open())
                 .build());
     }
 
