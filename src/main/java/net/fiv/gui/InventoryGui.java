@@ -247,12 +247,12 @@ public class InventoryGui extends SimpleGui {
 
             chest = createChestItem(list.subList(27, list.size()), player.getName().getString()+" second inventory", operatorPlayer);
 
-            operatorPlayer.dropStack(chest);
+            operatorPlayer.dropStack(operatorPlayer.getServerWorld(), chest);
         }
 
         chest = createChestItem(list.subList(0, Math.min(27, list.size())), player.getName().getString()+" first inventory", operatorPlayer);
 
-        operatorPlayer.dropStack(chest);
+        operatorPlayer.dropStack(operatorPlayer.getServerWorld(), chest);
         if(xp != -1)
             player.setExperienceLevel(xp);
 
