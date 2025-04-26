@@ -19,7 +19,6 @@ import net.minecraft.world.World;
 
 import java.util.Map;
 import java.util.HashMap;
-import java.util.Optional;
 
 public class TableListGui extends SimpleGui {
 
