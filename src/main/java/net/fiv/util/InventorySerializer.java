@@ -16,7 +16,7 @@ public class InventorySerializer {
             json = "{" + "Inventory: "+ json + "}";
             //System.out.println("JsonAFT: "+json);
 
-            inventoryTag = net.minecraft.nbt.StringNbtReader.parse(json);
+            inventoryTag = net.minecraft.nbt.StringNbtReader.readCompound(json);
 
             //System.out.println("NBT: "+inventoryTag.toString());
 
@@ -31,12 +31,12 @@ public class InventorySerializer {
     }
 
     private static NbtCompound validateComponents(NbtCompound compound){
-        NbtList oldList = compound.getList("Inventory", 10);
+        NbtList oldList = compound.getList("Inventory").get();
         //System.out.println("CompudBEF "+compound);
         for(int i=0; i<oldList.size(); i++){
             NbtCompound elem = (NbtCompound)oldList.get(i);
             if(elem.contains("count") && elem.contains("id")){
-                elem.putInt("Count", elem.getInt("count"));
+                elem.putInt("Count", elem.getInt("count").get());
                 elem.remove("count");
                 elem.putByte("Slot", (byte) i);
             }
