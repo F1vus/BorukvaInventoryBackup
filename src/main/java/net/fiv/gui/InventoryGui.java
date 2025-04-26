@@ -123,10 +123,17 @@ public class InventoryGui extends SimpleGui {
         int index = 0;
         PlayerInventory playerInventory = player.getInventory();
 
+        List<ItemStack> armor = List.of(
+                player.getInventory().getStack(36),
+                player.getInventory().getStack(37),
+                player.getInventory().getStack(38),
+                player.getInventory().getStack(39)
+        );
+
         savePreRestorePlayerInventory(player.getName().getString(),
-                playerItems(playerInventory.main, player).toString(),
-                playerItems(playerInventory.armor, player).toString(),
-                playerItems(playerInventory.offHand, player).toString(),
+                playerItems(playerInventory.getMainStacks(), player).toString(),
+                playerItems(armor, player).toString(),
+                playerItems(List.of(player.getOffHandStack()), player).toString(),
                 playerItems(player.getEnderChestInventory().heldStacks, player).toString(),
                 true,
                 xp
@@ -159,8 +166,8 @@ public class InventoryGui extends SimpleGui {
 
             NbtCompound nbtCompound = NbtIo.readCompressed(new FileInputStream(file2), NbtSizeTracker.ofUnlimitedBytes());
 
-            NbtList inventoryList = nbtCompound.getList("Inventory", 10);
-            NbtList enderChestLists = nbtCompound.getList("EnderItems", 10);
+            NbtList inventoryList = nbtCompound.getList("Inventory").get();
+            NbtList enderChestLists = nbtCompound.getList("EnderItems").get();
 
             savePreRestorePlayerInventory(playerName, inventoryList, enderChestLists ,xp);
 

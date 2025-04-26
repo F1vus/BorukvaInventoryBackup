@@ -63,7 +63,7 @@ public class TableListGui extends SimpleGui {
 
         NbtCompound nbtCompoundArmor = InventorySerializer.deserializeInventory(armor);
         //System.out.println("armor: "+armor);
-        NbtList nbtListArmor = nbtCompoundArmor.getList("Inventory", 10);
+        NbtList nbtListArmor = nbtCompoundArmor.getList("Inventory").get();
         //System.out.println("NbtArmor "+ nbtListArmor.toString());
 
         int index = 0;
@@ -77,10 +77,10 @@ public class TableListGui extends SimpleGui {
 
                 itemStack = ItemStack.fromNbt(world.getRegistryManager(), nbtElement).get();
 
-            } else if(Registries.ITEM.get(Identifier.of(itemNbt.getString("id"))).equals(Items.AIR)){
+            } else if(Registries.ITEM.get(Identifier.of(itemNbt.getString("id").get())).equals(Items.AIR)){
                 itemStack = new ItemStack(Items.AIR);
             } else{
-                itemStack = new ItemStack(Registries.ITEM.get(Identifier.of(itemNbt.getString("id"))), itemNbt.getInt("Count"));
+                itemStack = new ItemStack(Registries.ITEM.get(Identifier.of(itemNbt.getString("id").get())), itemNbt.getInt("Count").get());
             }
 
             itemsToGive.put(index, itemStack);
@@ -89,7 +89,7 @@ public class TableListGui extends SimpleGui {
 
         NbtCompound nbtCompoundOffHand = InventorySerializer.deserializeInventory(offHand);
        // System.out.println("OffHand: "+nbtCompoundOffHand);
-        NbtList nbtListOffHand = nbtCompoundOffHand.getList("Inventory", 10);
+        NbtList nbtListOffHand = nbtCompoundOffHand.getList("Inventory").get();
 
 
         for(NbtElement nbtElement: nbtListOffHand){
@@ -104,11 +104,11 @@ public class TableListGui extends SimpleGui {
             if(itemNbt.contains("components")){
 
                 itemStack = ItemStack.fromNbt(world.getRegistryManager(), nbtElement).get();
-            } else if(Registries.ITEM.get(Identifier.of(itemNbt.getString("id"))).equals(Items.AIR)){
+            } else if(Registries.ITEM.get(Identifier.of(itemNbt.getString("id").get())).equals(Items.AIR)){
                 itemStack = new ItemStack(Items.AIR);
 
             }else {
-                itemStack = new ItemStack(Registries.ITEM.get(Identifier.of(itemNbt.getString("id"))), itemNbt.getInt("Count"));
+                itemStack = new ItemStack(Registries.ITEM.get(Identifier.of(itemNbt.getString("id").get())), itemNbt.getInt("Count").get());
             }
 
             itemsToGive.put(index, itemStack);
@@ -117,7 +117,7 @@ public class TableListGui extends SimpleGui {
 
 
         NbtCompound nbtCompoundInventory = InventorySerializer.deserializeInventory(inventory);
-        NbtList nbtListInventory = nbtCompoundInventory.getList("Inventory", 10);
+        NbtList nbtListInventory = nbtCompoundInventory.getList("Inventory").get();
        // System.out.println("inv: "+inventory);
 
         for(NbtElement nbtElement: nbtListInventory){
@@ -130,11 +130,11 @@ public class TableListGui extends SimpleGui {
             //System.out.println("BLOCKTAG: "+itemNbt.getString("id")); //
             if(itemNbt.contains("components")){
                 itemStack = ItemStack.fromNbt(world.getRegistryManager(), nbtElement).get();
-            } else if(Registries.ITEM.get(Identifier.of(itemNbt.getString("id"))).equals(Items.AIR)){
+            } else if(Registries.ITEM.get(Identifier.of(itemNbt.getString("id").get())).equals(Items.AIR)){
                 itemStack = new ItemStack(Items.AIR);
 
             }else {
-                itemStack = new ItemStack(Registries.ITEM.get(Identifier.of(itemNbt.getString("id"))), itemNbt.getInt("Count"));
+                itemStack = new ItemStack(Registries.ITEM.get(Identifier.of(itemNbt.getString("id").get())), itemNbt.getInt("Count").get());
             }
 
             itemsToGive.put(index, itemStack);
@@ -151,7 +151,7 @@ public class TableListGui extends SimpleGui {
 
         NbtCompound nbtCompoundArmor = InventorySerializer.deserializeInventory(enderChest);
         //System.out.println("armor: "+armor);
-        NbtList nbtListArmor = nbtCompoundArmor.getList("Inventory", 10);
+        NbtList nbtListArmor = nbtCompoundArmor.getList("Inventory").get();
         //System.out.println("NbtArmor "+ nbtListArmor.toString());
 
         int index = 0;
@@ -165,10 +165,10 @@ public class TableListGui extends SimpleGui {
 
                 itemStack = ItemStack.fromNbt(world.getRegistryManager(), nbtElement).get();
 
-            } else if (Registries.ITEM.get(Identifier.of(itemNbt.getString("id"))).equals(Items.AIR)) {
+            } else if (Registries.ITEM.get(Identifier.of(itemNbt.getString("id").get())).equals(Items.AIR)) {
                 itemStack = new ItemStack(Items.AIR);
             } else {
-                itemStack = new ItemStack(Registries.ITEM.get(Identifier.of(itemNbt.getString("id"))), itemNbt.getInt("Count"));
+                itemStack = new ItemStack(Registries.ITEM.get(Identifier.of(itemNbt.getString("id").get())), itemNbt.getInt("Count").get());
             }
 
             itemsToGive.put(index, itemStack);

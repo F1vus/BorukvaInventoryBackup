@@ -15,10 +15,7 @@ import net.minecraft.util.WorldSavePath;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import static net.fiv.gui.InventoryGui.playerItems;
 
@@ -105,7 +102,8 @@ public class EnderChestGui extends SimpleGui {
 
             NbtCompound nbtCompound = NbtIo.readCompressed(new FileInputStream(file2), NbtSizeTracker.ofUnlimitedBytes());
 
-            NbtList inventoryList = nbtCompound.getList("EnderItems");
+            NbtList inventoryList = nbtCompound.getList("EnderItems").get();
+
 
             InventoryGui.savePreRestorePlayerInventory(playerName,
                     inventoryList.toString(),
