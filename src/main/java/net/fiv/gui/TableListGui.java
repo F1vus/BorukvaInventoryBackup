@@ -19,6 +19,7 @@ import net.minecraft.world.World;
 
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Optional;
 
 public class TableListGui extends SimpleGui {
 
@@ -73,11 +74,11 @@ public class TableListGui extends SimpleGui {
             //System.out.println("SlotByte: "+itemNbt.getByte("Slot"));
             ItemStack itemStack;
             //System.out.println("BLOCKTAG: "+itemNbt.getString("id")); //
-            if(itemNbt.contains("components")){
-
+            if(!itemNbt.getString("id").get().equals("minecraft:air")){
+                System.out.println(nbtElement);
                 itemStack = ItemStack.fromNbt(world.getRegistryManager(), nbtElement).get();
 
-            } else if(Registries.ITEM.get(Identifier.of(itemNbt.getString("id").get())).equals(Items.AIR)){
+            } else if(itemNbt.getString("id").get().equals("minecraft:air")){
                 itemStack = new ItemStack(Items.AIR);
             } else{
                 itemStack = new ItemStack(Registries.ITEM.get(Identifier.of(itemNbt.getString("id").get())), itemNbt.getInt("Count").get());
@@ -101,10 +102,10 @@ public class TableListGui extends SimpleGui {
             ItemStack itemStack;
 
             //System.out.println("BLOCKTAG: "+itemNbt.getString("id")); //
-            if(itemNbt.contains("components")){
+            if(!itemNbt.getString("id").get().equals("minecraft:air")){
 
                 itemStack = ItemStack.fromNbt(world.getRegistryManager(), nbtElement).get();
-            } else if(Registries.ITEM.get(Identifier.of(itemNbt.getString("id").get())).equals(Items.AIR)){
+            } else if(itemNbt.getString("id").get().equals("minecraft:air")){
                 itemStack = new ItemStack(Items.AIR);
 
             }else {
@@ -128,9 +129,9 @@ public class TableListGui extends SimpleGui {
             ItemStack itemStack;
 
             //System.out.println("BLOCKTAG: "+itemNbt.getString("id")); //
-            if(itemNbt.contains("components")){
+            if(!itemNbt.getString("id").get().equals("minecraft:air")){
                 itemStack = ItemStack.fromNbt(world.getRegistryManager(), nbtElement).get();
-            } else if(Registries.ITEM.get(Identifier.of(itemNbt.getString("id").get())).equals(Items.AIR)){
+            } else if(itemNbt.getString("id").get().equals("minecraft:air")){
                 itemStack = new ItemStack(Items.AIR);
 
             }else {
@@ -161,11 +162,11 @@ public class TableListGui extends SimpleGui {
             //System.out.println("SlotByte: "+itemNbt.getByte("Slot"));
             ItemStack itemStack;
             //System.out.println("BLOCKTAG: "+itemNbt.getString("id")); //
-            if (itemNbt.contains("components")) {
+            if (!itemNbt.getString("id").get().equals("minecraft:air")) {
 
                 itemStack = ItemStack.fromNbt(world.getRegistryManager(), nbtElement).get();
 
-            } else if (Registries.ITEM.get(Identifier.of(itemNbt.getString("id").get())).equals(Items.AIR)) {
+            } else if (itemNbt.getString("id").get().equals("minecraft:air")) {
                 itemStack = new ItemStack(Items.AIR);
             } else {
                 itemStack = new ItemStack(Registries.ITEM.get(Identifier.of(itemNbt.getString("id").get())), itemNbt.getInt("Count").get());
