@@ -105,7 +105,7 @@ public class EnderChestGui extends SimpleGui {
 
             NbtCompound nbtCompound = NbtIo.readCompressed(new FileInputStream(file2), NbtSizeTracker.ofUnlimitedBytes());
 
-            NbtList inventoryList = nbtCompound.getList("EnderItems", 10);
+            NbtList inventoryList = nbtCompound.getList("EnderItems");
 
             InventoryGui.savePreRestorePlayerInventory(playerName,
                     inventoryList.toString(),
