@@ -74,7 +74,7 @@ public class TableListGui extends SimpleGui {
             ItemStack itemStack;
             //System.out.println("BLOCKTAG: "+itemNbt.getString("id")); //
             if(!itemNbt.getString("id").get().equals("minecraft:air")){
-                System.out.println(nbtElement);
+
                 itemStack = ItemStack.fromNbt(world.getRegistryManager(), nbtElement).get();
 
             } else if(itemNbt.getString("id").get().equals("minecraft:air")){
