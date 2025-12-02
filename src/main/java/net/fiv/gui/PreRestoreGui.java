@@ -26,7 +26,6 @@ public class PreRestoreGui extends SimpleGui {
         this.page = page;
 
         addButtons();
-
     }
 
     @Override
@@ -50,6 +49,7 @@ public class PreRestoreGui extends SimpleGui {
             String armor = this.preRestoreTableList.get(tableSize-i-1).getArmor();
             String offHand = this.preRestoreTableList.get(tableSize-i-1).getOffHand();
             String enderChest = this.preRestoreTableList.get(tableSize-i-1).getEnderChest();
+
             int xp = this.preRestoreTableList.get(tableSize-i-1).getXp();
             boolean isInventory = this.preRestoreTableList.get(tableSize-i-1).isTableType();
 
@@ -58,11 +58,11 @@ public class PreRestoreGui extends SimpleGui {
                     .addLoreLine(Text.literal("XpLevel: "+this.preRestoreTableList.get(tableSize-i-1).getXp()))
                     .setCallback((index, type, action) -> {
                         Map<Integer, ItemStack> itemStackList = TableListGui.inventorySerialization(inventory, armor, offHand, player);
-                        Map<Integer, ItemStack> enderChestItemStackList = TableListGui.inventorySerialization(enderChest, player);
+
                         if(isInventory){
-                            new InventoryGui(player, this.preRestoreTableList.getFirst().getName(), itemStackList, enderChestItemStackList,xp, this).open();
+                            new InventoryGui(player, this.preRestoreTableList.getFirst().getName(), itemStackList, enderChest,xp, this).open();
                         } else {
-                            new EnderChestGui(player, this.preRestoreTableList.getFirst().getName(), itemStackList, this).open();
+                            new EnderChestGui(player, this.preRestoreTableList.getFirst().getName(), enderChest, this).open();
                         }
 
                     })
@@ -73,25 +73,19 @@ public class PreRestoreGui extends SimpleGui {
         if (lastIndex < this.preRestoreTableList.size()) {
             this.setSlot(53, new GuiElementBuilder(Items.ARROW)
                     .setName(Text.literal("Next Page"))
-                    .setCallback((index, type, action) -> {
-                        new PreRestoreGui(player, page + 1, this.preRestoreTableList).open();
-                    })
+                    .setCallback((index, type, action) -> new PreRestoreGui(player, page + 1, this.preRestoreTableList).open())
                     .build());
         }
 
         this.setSlot(49, new GuiElementBuilder(Items.EMERALD)
                 .setName(Text.literal("Back to tables list"))
-                .setCallback((index, type, action) -> {
-                    new TableListGui(player, preRestoreTableList.getFirst().getName()).open();
-                })
+                .setCallback((index, type, action) -> new TableListGui(player, preRestoreTableList.getFirst().getName()).open())
                 .build());
 
         if (page > 0) {
             this.setSlot(45, new GuiElementBuilder(Items.ARROW)
                     .setName(Text.literal("Previous Page"))
-                    .setCallback((index, type, action) -> {
-                        new PreRestoreGui(player, page - 1, this.preRestoreTableList).open();
-                    })
+                    .setCallback((index, type, action) -> new PreRestoreGui(player, page - 1, this.preRestoreTableList).open())
                     .build());
         }
 //        System.out.println(TableListGui.activeTables);

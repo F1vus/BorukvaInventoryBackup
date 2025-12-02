@@ -13,49 +13,43 @@ import java.util.List;
 
 
 public class BorukvaInventoryBackupDB {
-    private final Dao<DeathTable, String> deathTableDao;
-    private final Dao<LoginTable, String> loginTableDao;
-    private final Dao<LogoutTable, String> logoutTableDao;
-    private final Dao<PreRestoreTable, String> preRestoreTableDao;
+    private Dao<DeathTable, String> deathTableDao;
+    private Dao<LoginTable, String> loginTableDao;
+    private Dao<LogoutTable, String> logoutTableDao;
+    private Dao<PreRestoreTable, String> preRestoreTableDao;
     private final JdbcConnectionSource connectionSource;
 
     public BorukvaInventoryBackupDB() throws SQLException {
         connectionSource = new JdbcConnectionSource("jdbc:h2:./"+BorukvaInventoryBackup.MOD_ID);
-
-        TableUtils.createTableIfNotExists(connectionSource, DeathTable.class);
-        TableUtils.createTableIfNotExists(connectionSource, LoginTable.class);
-        TableUtils.createTableIfNotExists(connectionSource, LogoutTable.class);
-        TableUtils.createTableIfNotExists(connectionSource, PreRestoreTable.class);
-
-        deathTableDao = DaoManager.createDao(connectionSource, DeathTable.class);
-        loginTableDao = DaoManager.createDao(connectionSource, LoginTable.class);
-        logoutTableDao = DaoManager.createDao(connectionSource, LogoutTable.class);
-        preRestoreTableDao = DaoManager.createDao(connectionSource, PreRestoreTable.class);
+        init();
 
         modifyTableForH2();
-
     }
 
     public BorukvaInventoryBackupDB(String url, String user, String password) throws SQLException {
-        connectionSource = new JdbcConnectionSource("jdbc:mysql://"+url, user, password);
+        connectionSource = new JdbcConnectionSource(url, user, password);
+        init();
+    }
 
+    private void init() throws SQLException {
         TableUtils.createTableIfNotExists(connectionSource, DeathTable.class);
         TableUtils.createTableIfNotExists(connectionSource, LoginTable.class);
         TableUtils.createTableIfNotExists(connectionSource, LogoutTable.class);
         TableUtils.createTableIfNotExists(connectionSource, PreRestoreTable.class);
-        
+
         deathTableDao = DaoManager.createDao(connectionSource, DeathTable.class);
         loginTableDao = DaoManager.createDao(connectionSource, LoginTable.class);
         logoutTableDao = DaoManager.createDao(connectionSource, LogoutTable.class);
         preRestoreTableDao = DaoManager.createDao(connectionSource, PreRestoreTable.class);
     }
 
+
     public void addDataDeath(String name, String world, String place,
-                                   String date, String reason, String inventory, String armor, String offHand, String enderChest, int xp) throws SQLException {
+                             String date, String reason, String inventory, String armor, String offHand, String enderChest, int xp) throws SQLException {
 
         deleteOldestRecord(name, deathTableDao);
 
-        DeathTable deathTable = new DeathTable(name, world, place, date, reason, inventory, armor, offHand, enderChest,xp);
+        DeathTable deathTable = new DeathTable(name, world, place, date, inventory, armor, offHand, enderChest, xp, reason);
 
         deathTableDao.create(deathTable);
     }
@@ -71,7 +65,7 @@ public class BorukvaInventoryBackupDB {
     }
 
     public void addDataLogout(String name, String world, String place,
-                             String date, String inventory, String armor, String offHand, String enderChest,int xp) throws SQLException{
+                              String date, String inventory, String armor, String offHand, String enderChest,int xp) throws SQLException{
 
         deleteOldestRecord(name, logoutTableDao);
 
@@ -120,15 +114,18 @@ public class BorukvaInventoryBackupDB {
         return null;
     }
 
-    private void deleteOldestRecord(String playerName, Dao dao) throws SQLException{
-        List<Table> results = dao.queryForEq("name", playerName);
-        if(results != null && !results.isEmpty()){
-            int maxRecords = ModConfigs.getCONFIG().getOrDefault("key.borukvaInventoryBackup.MAX_RECORDS", 100);
+    private <T extends BaseEntity> void deleteOldestRecord(String playerName, Dao<T, String> dao) throws SQLException{
+        List<T> results = dao.queryForEq("name", playerName);
+
+        if (results != null && !results.isEmpty()) {
+            int maxRecords = ModConfigs.getCONFIG()
+                    .getOrDefault("key.borukvaInventoryBackup.MAX_RECORDS", 100);
+
             if (results.size() >= maxRecords) {
                 int recordsForDelete = results.size() - maxRecords;
                 int index = 0;
-                while(recordsForDelete >= 0){
-                    Table oldestRecord = results.get(index);
+                while (recordsForDelete > 0) {
+                    T oldestRecord = results.get(index);
                     dao.delete(oldestRecord);
                     index++;
                     recordsForDelete--;

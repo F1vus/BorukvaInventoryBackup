@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '1.7-SNAPSHOT'
+	id 'fabric-loom' version '1.11-SNAPSHOT'
 	id 'maven-publish'
 }
 
@@ -32,8 +32,8 @@ dependencies {
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
 	// lombok
-	compileOnly 'org.projectlombok:lombok:1.18.34'
-	annotationProcessor 'org.projectlombok:lombok:1.18.34'
+	compileOnly("org.projectlombok:lombok:1.18.38")
+	annotationProcessor("org.projectlombok:lombok:1.18.38")
 
 	// Config
 //	implementation 'com.google.code.gson:gson:2.10.1'
@@ -52,8 +52,8 @@ dependencies {
 	include (implementation 'org.scala-lang:scala3-library_3:3.3.3')
 	include (implementation "org.scala-lang.modules:scala-java8-compat_2.13:1.0.2")
 
-	modImplementation include("eu.pb4:sgui:1.6.0+1.21")
-	include(modImplementation('me.lucko:fabric-permissions-api:0.3.1'))
+	modImplementation include("eu.pb4:sgui:1.9.0+1.21.5")
+	include(modImplementation('me.lucko:fabric-permissions-api:0.4.1'))
 }
 
 processResources {

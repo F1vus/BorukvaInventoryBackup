@@ -24,8 +24,8 @@ public class ModConfigs {
 
     private static void createConfigs() {
         configs.addKeyValuePair(new Pair<>("key.borukvaInventoryBackup.MAX_RECORDS", 100), "int");
-        configs.addKeyValuePair(new Pair<>("key.borukvaInventoryBackup.DATABASE", "H2"), "Select DB: H2(default), MySQL");
-        configs.addKeyValuePair(new Pair<>("key.borukvaInventoryBackup.DB_URL", "localhost:3306"), "URL to MySQL db. Not work if choice H2");
+        configs.addKeyValuePair(new Pair<>("key.borukvaInventoryBackup.DATABASE_TYPE", "H2"), "Select DB: H2(default) or MySQL");
+        configs.addKeyValuePair(new Pair<>("key.borukvaInventoryBackup.DB_URL", "jdbc:mysql://localhost:3306/mydatabase"), "URL to MySQL db. Not work if choice H2");
         configs.addKeyValuePair(new Pair<>("key.borukvaInventoryBackup.DB_USER", "user"), "USER to MySQL db. Not work if choice H2");
         configs.addKeyValuePair(new Pair<>("key.borukvaInventoryBackup.DB_PASSWORD", "password"), "PASSWORD to MySQL db. Not work if choice H2");
     }

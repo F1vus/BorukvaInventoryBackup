@@ -9,10 +9,6 @@ public class ModConfigProvider implements SimpleConfig.DefaultConfig {
 
     private String configContents = "";
 
-    public List<Pair> getConfigsList() {
-        return configsList;
-    }
-
     private final List<Pair> configsList = new ArrayList<>();
 
     public void addKeyValuePair(Pair<String, ?> keyValuePair, String comment) {

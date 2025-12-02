@@ -8,36 +8,26 @@ public class InventorySerializer {
 
     public static NbtCompound deserializeInventory(String json) {
         NbtCompound inventoryTag = new NbtCompound();
-        //System.out.println("Json "+json);
 
         try{
-            //System.out.println("Json: "+json);
-           // json = json.substring( 1, json.length() - 1 );
             json = "{" + "Inventory: "+ json + "}";
-            //System.out.println("JsonAFT: "+json);
 
-            inventoryTag = net.minecraft.nbt.StringNbtReader.parse(json);
-
-            //System.out.println("NBT: "+inventoryTag.toString());
-
+            inventoryTag = net.minecraft.nbt.StringNbtReader.readCompound(json);
 
             return validateComponents(inventoryTag);
         } catch (CommandSyntaxException e){
             BorukvaInventoryBackup.LOGGER.error(e.getMessage());
         }
 
-        //System.out.println("SeriInvTag: "+inventoryTag);
         return inventoryTag;
     }
 
     private static NbtCompound validateComponents(NbtCompound compound){
-        NbtList oldList = compound.getList("Inventory", 10);
-        //System.out.println("CompudBEF "+compound);
+        NbtList oldList = compound.getList("Inventory").get();
+
         for(int i=0; i<oldList.size(); i++){
             NbtCompound elem = (NbtCompound)oldList.get(i);
             if(elem.contains("count") && elem.contains("id")){
-                elem.putInt("Count", elem.getInt("count"));
-                elem.remove("count");
                 elem.putByte("Slot", (byte) i);
             }
             if(elem.getCompound("components").isEmpty()){
@@ -46,9 +36,9 @@ public class InventorySerializer {
 
             oldList.set(i, elem);
         }
+
         compound.remove("Inventory");
         compound.put("Inventory", oldList);
-        //System.out.println("CompoudAFT "+compound);
         return compound;
     }
 

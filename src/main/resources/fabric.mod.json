@@ -11,7 +11,7 @@
 		"homepage": "https://modrinth.com/mod/borukva-inventory-backup",
 		"sources": "https://github.com/F1vus/BorukvaInventoryBackup"
 	},
-	"license": "CC-BY-SA-4.0",
+	"license": "LGPLv3",
 	"icon": "assets/borukva_inventory_backup/icon.png",
 	"environment": "*",
 	"entrypoints": {
@@ -27,7 +27,7 @@
 	],
 	"depends": {
 		"fabricloader": ">=0.16.0",
-		"minecraft": ">=1.21",
+		"minecraft": ">=1.21.8",
 		"java": ">=21",
 		"fabric-api": "*",
 		"kotori_scala": "*"

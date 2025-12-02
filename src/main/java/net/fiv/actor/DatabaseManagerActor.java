@@ -29,6 +29,7 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class DatabaseManagerActor extends AbstractActor {
     @Getter
@@ -56,14 +57,8 @@ public class DatabaseManagerActor extends AbstractActor {
     }
 
     private void initializeDatabase(BActorMessages.InitializeDatabase msg) {
-//        MinecraftServer server = msg.server();
         try {
-//            File worldPath = server.getSavePath(WorldSavePath.ROOT).toFile();
-//            File dataBaseFile = new File(worldPath, MOD_ID+".db");
-//
-//            if(dataBaseFile.createNewFile()){
-//                BorukvaInventoryBackup.LOGGER.info("DataBase file successfully created!");
-//            }
+
             String dbType = ModConfigs.getCONFIG().getOrDefault("key.borukvaInventoryBackup.DATABASE", "H2");
 
             if("h2".equalsIgnoreCase(dbType)){
@@ -110,8 +105,13 @@ public class DatabaseManagerActor extends AbstractActor {
         ServerPlayerEntity player = msg.player();
         DamageSource source = msg.source();
 
-        DefaultedList<ItemStack> inventory = player.getInventory().main;
-        DefaultedList<ItemStack> armor = player.getInventory().armor;
+        DefaultedList<ItemStack> inventory = player.getInventory().getMainStacks();
+        List<ItemStack> armor = List.of(
+                player.getInventory().getStack(36),
+                player.getInventory().getStack(37),
+                player.getInventory().getStack(38),
+                player.getInventory().getStack(39)
+                );
         DefaultedList<ItemStack> enderChest = player.getEnderChestInventory().heldStacks;
         List<ItemStack> offHand = new ArrayList<>();
         offHand.add(player.getOffHandStack());
@@ -125,7 +125,7 @@ public class DatabaseManagerActor extends AbstractActor {
         String place = "%.2f %.2f %.2f".formatted(x, y, z);
 
         String deathTime = LocalDateTime.now().toString();
-        String formattedDeathTime = deathTime.replace("T", " ").split("\\.")[0];
+        String formattedTime = deathTime.replace("T", " ").split("\\.")[0];
 
         String deathReason = source.getName();
 
@@ -137,7 +137,7 @@ public class DatabaseManagerActor extends AbstractActor {
 
         int xp = player.experienceLevel;
         try {
-            borukvaInventoryBackupDB.addDataDeath(name, world, place, formattedDeathTime, deathReason, inventr, armorString, offHandString, enderChestString, xp);
+            borukvaInventoryBackupDB.addDataDeath(name, world, place, formattedTime, deathReason, inventr, armorString, offHandString, enderChestString, xp);
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
         }
@@ -147,9 +147,14 @@ public class DatabaseManagerActor extends AbstractActor {
     private void onPlayerConnect(BActorMessages.SavePlayerDataOnPlayerConnect msg) {
         ServerPlayerEntity player = msg.player();
 
-        DefaultedList<ItemStack> inventory = player.getInventory().main;
+        DefaultedList<ItemStack> inventory = player.getInventory().getMainStacks();
         //System.out.println("DefaultedList: "+inventory);
-        DefaultedList<ItemStack> armor = player.getInventory().armor;
+        List<ItemStack> armor = List.of(
+                player.getInventory().getStack(36),
+                player.getInventory().getStack(37),
+                player.getInventory().getStack(38),
+                player.getInventory().getStack(39)
+        );
         DefaultedList<ItemStack> enderChest = player.getEnderChestInventory().heldStacks;
         List<ItemStack> offHand = new ArrayList<>();
         offHand.add(player.getOffHandStack());
@@ -163,7 +168,7 @@ public class DatabaseManagerActor extends AbstractActor {
         String world = player.getWorld().getRegistryKey().getValue().toString();
 
         String loginTime = LocalDateTime.now().toString();
-        String formattedLoginTime = loginTime.replace("T", " ").split("\\.")[0];
+        String formattedTime = loginTime.replace("T", " ").split("\\.")[0];
 
         String inventr = InventoryGui.playerItems(inventory, player).toString();
         String armorString = InventoryGui.playerItems(armor, player).toString();
@@ -174,7 +179,7 @@ public class DatabaseManagerActor extends AbstractActor {
         int xp = player.experienceLevel;
 
         try {
-            borukvaInventoryBackupDB.addDataLogin(name, world, place, formattedLoginTime, inventr, armorString, offHandString,enderChestString,xp);
+            borukvaInventoryBackupDB.addDataLogin(name, world, place, formattedTime, inventr, armorString, offHandString,enderChestString,xp);
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
         }
@@ -183,8 +188,13 @@ public class DatabaseManagerActor extends AbstractActor {
     private void onPlayerLogout(BActorMessages.SavePlayerDataOnPlayerLogout msg) {
         ServerPlayerEntity player = msg.player();
 
-        DefaultedList<ItemStack> inventory = player.getInventory().main;
-        DefaultedList<ItemStack> armor = player.getInventory().armor;
+        DefaultedList<ItemStack> inventory = player.getInventory().getMainStacks();
+        List<ItemStack> armor = List.of(
+                player.getInventory().getStack(36),
+                player.getInventory().getStack(37),
+                player.getInventory().getStack(38),
+                player.getInventory().getStack(39)
+        );
         DefaultedList<ItemStack> enderChest = player.getEnderChestInventory().heldStacks;
         List<ItemStack> offHand = new ArrayList<>();
         offHand.add(player.getOffHandStack());
@@ -197,8 +207,8 @@ public class DatabaseManagerActor extends AbstractActor {
         String name = player.getName().getString();
         String world = player.getWorld().getRegistryKey().getValue().toString();
 
-        String loginTime = LocalDateTime.now().toString();
-        String formattedLoginTime = loginTime.replace("T", " ").split("\\.")[0];
+        String logoutTime = LocalDateTime.now().toString();
+        String formattedTime = logoutTime.replace("T", " ").split("\\.")[0];
 
         String inventr = InventoryGui.playerItems(inventory, player).toString();
         String armorString = InventoryGui.playerItems(armor, player).toString();
@@ -208,49 +218,62 @@ public class DatabaseManagerActor extends AbstractActor {
         int xp = player.experienceLevel;
 
         try {
-            borukvaInventoryBackupDB.addDataLogout(name, world, place, formattedLoginTime, inventr, armorString, offHandString, enderChestString,xp);
+            borukvaInventoryBackupDB.addDataLogout(name, world, place, formattedTime, inventr, armorString, offHandString, enderChestString,xp);
         } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
         }
     }
 
     private void onPlayerRestore(BActorMessages.SavePlayerDataOnPlayerRestore msg){
-        String loginTime = LocalDateTime.now().toString();
-        String formattedLoginTime = loginTime.replace("T", " ").split("\\.")[0];
+        String restoreTime = LocalDateTime.now().toString();
+        String formattedTime = restoreTime.replace("T", " ").split("\\.")[0];
 
         try{
-            borukvaInventoryBackupDB.addDataPreRestore(msg.playerName(), formattedLoginTime, msg.inventory(), msg.armor(), msg.offHand(), msg.enderChest(), msg.isInventory(), msg.xp());
+            borukvaInventoryBackupDB.addDataPreRestore(msg.playerName(), formattedTime, msg.inventory(), msg.armor(), msg.offHand(), msg.enderChest(), msg.isInventory(), msg.xp());
         }catch (SQLException e){
             throw new SQLExceptionWrapper(e);
         }
     }
 
-    private void onPlayerRestoreNbt(BActorMessages.SavePlayerDataOnPlayerRestoreNbt msg){
+    private void onPlayerRestoreNbt(BActorMessages.SavePlayerDataOnPlayerRestoreNbt msg) {
         NbtList mainInventory = new NbtList();
         NbtList armor = new NbtList();
         NbtList offHand = new NbtList();
-        for(NbtElement nbtElement: msg.inventory()) {
-            NbtCompound itemNbt = (NbtCompound) nbtElement;
-            if(itemNbt.getByte("Slot") >= (byte) 100){
-              armor.add(itemNbt);
-            } else if(itemNbt.getByte("Slot") >= (byte) -106){
-                offHand.add(itemNbt);
-            } else {
-                mainInventory.add(itemNbt);
-            }
 
+        for (NbtElement nbtElement : msg.inventory()) {
+            NbtCompound itemNbt = (NbtCompound) nbtElement;
+            Optional<Byte> slotOpt = itemNbt.getByte("Slot");
+
+            if (slotOpt.isPresent()) {
+                byte slot = slotOpt.get();
+                if (slot >= (byte) 100) {
+                    armor.add(itemNbt);
+                } else if (slot >= (byte) -106) {
+                    offHand.add(itemNbt);
+                } else {
+                    mainInventory.add(itemNbt);
+                }
+            }
         }
 
-        String loginTime = LocalDateTime.now().toString();
-        String formattedLoginTime = loginTime.replace("T", " ").split("\\.")[0];
+        String restoreTime = LocalDateTime.now().toString();
+        String formattedTime = restoreTime.replace("T", " ").split("\\.")[0];
 
-        try{
-            borukvaInventoryBackupDB.addDataPreRestore(msg.playerName(), formattedLoginTime, mainInventory.toString(), armor.toString(), offHand.toString(), msg.enderChest().toString(), msg.isInventory(),msg.xp());
-        }catch (SQLException e){
+        try {
+            borukvaInventoryBackupDB.addDataPreRestore(
+                    msg.playerName(),
+                    formattedTime,
+                    mainInventory.toString(),
+                    armor.toString(),
+                    offHand.toString(),
+                    msg.enderChest().toString(),
+                    msg.isInventory(),
+                    msg.xp()
+            );
+        } catch (SQLException e) {
             throw new SQLExceptionWrapper(e);
         }
     }
-
 
     public void getDeathTableMap(BActorMessages.GetDeathTableMap msg) {
         ServerPlayerEntity player = msg.player();

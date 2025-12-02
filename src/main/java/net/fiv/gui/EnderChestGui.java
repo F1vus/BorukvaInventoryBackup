@@ -15,10 +15,7 @@ import net.minecraft.util.WorldSavePath;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import static net.fiv.gui.InventoryGui.playerItems;
 
@@ -26,8 +23,10 @@ public class EnderChestGui extends SimpleGui {
 
 
 
-    public EnderChestGui(ServerPlayerEntity player, String playerName,Map<Integer, ItemStack> enderChestMap, SimpleGui caller) {
+    public EnderChestGui(ServerPlayerEntity player, String playerName,String enderChest, SimpleGui caller) {
         super(ScreenHandlerType.GENERIC_9X4, player, false);
+
+        Map<Integer, ItemStack> enderChestMap = TableListGui.inventorySerialization(enderChest, player);
 
         addItems(enderChestMap, playerName,caller);
     }
@@ -45,7 +44,7 @@ public class EnderChestGui extends SimpleGui {
                 .setName(Text.literal("Backup player items to the box").formatted(Formatting.GREEN, Formatting.BOLD))
                 .setLore(new ArrayList<>(List.of(Text.literal("clear your inventory before issuing").formatted(Formatting.RED, Formatting.BOLD))))
                 .setCallback((index, type, action) -> {
-                    InventoryGui.backUpPlayerItemsToChest(enderChestMap, -1,this.player.getServer().getPlayerManager().getPlayer(playerName), this.player);
+                    InventoryGui.backUpPlayerItemsToChest(enderChestMap, playerName, this.player);
                     this.getPlayer().sendMessage(Text.literal("You have successfully restored items to box!").formatted(Formatting.GREEN, Formatting.BOLD));
                 })
                 .build());
@@ -105,7 +104,8 @@ public class EnderChestGui extends SimpleGui {
 
             NbtCompound nbtCompound = NbtIo.readCompressed(new FileInputStream(file2), NbtSizeTracker.ofUnlimitedBytes());
 
-            NbtList inventoryList = nbtCompound.getList("EnderItems", 10);
+            NbtList inventoryList = nbtCompound.getList("EnderItems").get();
+
 
             InventoryGui.savePreRestorePlayerInventory(playerName,
                     inventoryList.toString(),

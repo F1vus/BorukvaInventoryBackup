@@ -3,6 +3,7 @@ package net.fiv.gui;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import lombok.Setter;
+import net.fiv.BorukvaInventoryBackup;
 import net.fiv.data_base.entities.LogoutTable;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -48,6 +49,7 @@ public class LogoutHistoryGui extends SimpleGui {
             String armor = this.logoutTableList.get(tableSize-i-1).getArmor();
             String offHand = this.logoutTableList.get(tableSize-i-1).getOffHand();
             String enderChest = this.logoutTableList.get(tableSize-i-1).getEnderChest();
+
             int xp = this.logoutTableList.get(tableSize-i-1).getXp();
             this.setSlot(inventory_index, new GuiElementBuilder(Items.CHEST)
                     .setName(Text.literal("Time: "+this.logoutTableList.get(tableSize-i-1).getDate()))
@@ -56,8 +58,13 @@ public class LogoutHistoryGui extends SimpleGui {
                     .addLoreLine(Text.literal("XpLevel: "+this.logoutTableList.get(tableSize-i-1).getXp()))
                     .setCallback((index, type, action) -> {
                         Map<Integer, ItemStack> itemStackList = TableListGui.inventorySerialization(inventory, armor, offHand, player);
-                        Map<Integer, ItemStack> enderChestItemStackList = TableListGui.inventorySerialization(enderChest, player);
-                        new InventoryGui(player, this.logoutTableList.getFirst().getName(), itemStackList, enderChestItemStackList,xp, this).open();
+
+                        if(itemStackList.isEmpty()){
+                            BorukvaInventoryBackup.LOGGER.error("Can't create InventoryGUI because itemStackList is null");
+                            return;
+                        }
+
+                        new InventoryGui(player, this.logoutTableList.getFirst().getName(), itemStackList, enderChest, xp, this).open();
                     })
                     .build());
 
@@ -67,25 +74,19 @@ public class LogoutHistoryGui extends SimpleGui {
         if (lastIndex < this.logoutTableList.size()) {
             this.setSlot(53, new GuiElementBuilder(Items.ARROW)
                     .setName(Text.literal("Next Page"))
-                    .setCallback((index, type, action) -> {
-                        new LogoutHistoryGui(player, page+1, this.logoutTableList).open();
-                    })
+                    .setCallback((index, type, action) -> new LogoutHistoryGui(player, page+1, this.logoutTableList).open())
                     .build());
         }
 
         this.setSlot(49, new GuiElementBuilder(Items.EMERALD)
                 .setName(Text.literal("Back to tables list"))
-                .setCallback((index, type, action) -> {
-                    new TableListGui(player, logoutTableList.getFirst().getName()).open();
-                })
+                .setCallback((index, type, action) -> new TableListGui(player, logoutTableList.getFirst().getName()).open())
                 .build());
 
         if (page > 0) {
             this.setSlot(45, new GuiElementBuilder(Items.ARROW)
                     .setName(Text.literal("Previous Page"))
-                    .setCallback((index, type, action) -> {
-                        new LogoutHistoryGui(player, page-1, this.logoutTableList).open();
-                    })
+                    .setCallback((index, type, action) -> new LogoutHistoryGui(player, page-1, this.logoutTableList).open())
                     .build());
         }
 //        System.out.println(TableListGui.activeTables);

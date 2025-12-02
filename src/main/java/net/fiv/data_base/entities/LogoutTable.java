@@ -4,18 +4,14 @@ import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
 @DatabaseTable(tableName = "logout_table")
-public class LogoutTable implements Table {
-
-    @DatabaseField(generatedId = true)
-    private int id;
-
-    @DatabaseField(dataType = DataType.STRING)
-    private String name;
+public class LogoutTable extends BaseEntity {
 
     @DatabaseField(dataType = DataType.STRING)
     private String world;
@@ -23,38 +19,9 @@ public class LogoutTable implements Table {
     @DatabaseField(dataType = DataType.STRING)
     private String place;
 
-    @DatabaseField(dataType = DataType.STRING)
-    private String date;
-
-    @DatabaseField(dataType = DataType.LONG_STRING)
-    private String inventory;
-
-    @DatabaseField(dataType = DataType.LONG_STRING)
-    private String armor;
-
-    @DatabaseField(dataType = DataType.LONG_STRING)
-    private String offHand;
-
-    @DatabaseField(dataType = DataType.LONG_STRING)
-    private String enderChest;
-
-    @DatabaseField(dataType = DataType.INTEGER)
-    private int xp;
-
-    public LogoutTable(String name, String world, String place, String date, String inventory,
-                       String armor, String offHand, String enderChest, int xp) {
-        this.name = name;
+    public LogoutTable(String name, String world, String place, String date, String inventory, String armor, String offHand, String enderChest, int xp) {
+        super(name, date, inventory, armor, offHand, enderChest, xp);
         this.world = world;
         this.place = place;
-        this.date = date;
-        this.inventory = inventory;
-        this.armor = armor;
-        this.offHand = offHand;
-        this.enderChest = enderChest;
-        this.xp = xp;
     }
-
-    public LogoutTable(){
-    }
-
 }
